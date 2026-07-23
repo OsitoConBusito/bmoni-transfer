@@ -55,19 +55,30 @@ Set mínimo reutilizable, todos widgets-como-clase:
 
 ---
 
-## Branding BMONI (assets reales)
+## Fuente de verdad de la UI: diseño de Claude Design
 
-Assets oficiales en `app/assets/brand/` (descargados de bmoni.com): `bmoni-logo.webp`,
-`bmoni-logo-white.webp` (para fondos oscuros), `bmoni-favicon.png` (1032², base del ícono de app).
-**Paleta de marca** (extraída del sitio) — familia púrpura/magenta:
-- `brandMagenta #C94CD7` (seed principal) · `brandDeep #370E36` (base oscura) ·
-  `brandLavender #D8B4D7` · `brandPink #FDA9FF` · `brandStrong #B001B0`.
-Uso como homenaje/prototipo para el take-home (entregable a la propia BMONI), no producción.
+`design/BMONI.dc.html` (importado del proyecto "BMONI remesas fintech UI") es la **referencia
+visual autoritativa**. Implementamos **sin la pantalla de onboarding** (decisión del usuario).
+Los widgets del DS y el theme se derivan de sus tokens (abajo).
+
+### Assets de marca
+`app/assets/brand/`: `bmoni-logo.webp`, `bmoni-logo-white.webp`, `bmoni-favicon.png` (de bmoni.com).
+Nota: el diseño usa un logo-mark propio (una "b" en gradiente teal). Decidir en implementación entre
+el mark del diseño y el logo real; ambos disponibles.
+
+### Design tokens (extraídos de `BMONI.dc.html`) — tema dark fintech, acento teal
+- **Fuentes:** `Plus Jakarta Sans` (UI/body) + `Space Grotesk` (display de montos / marca).
+- **Acento:** `teal #37C2CB` (primario) · `#5AD3DB` (hover) · `#0F7A82` (deep) · `#04262A` (darkest).
+- **Superficies (dark):** `#0B0F14` (fondo base) · `#12181F` · `#1A222B` · `#1C2530` · `#263039` (cards/borders).
+- **Texto:** `#F3F5F7` (bright) · `#E7ECF1` (primario) · `#A2AEBB`/`#9AA6B2` (secundario) · `#6B7683` (muted).
+- **Radii:** cards `12/16/18`, pill `999`, hero `42`. **Semánticos de dinero:** definir `positive`
+  (USD recibido), `negative`/`fee`, `warning` (expiración) desde la paleta del diseño.
 
 ## Theming (`core/theme/`)
 
-- `ThemeData` claro y oscuro desde **`ColorScheme.fromSeed(seedColor: brandMagenta)`** — M3.
-  (Si Claude Design entrega tokens afinados, reemplazan estos valores.)
+- `ThemeData` desde **`ColorScheme.fromSeed(seedColor: teal #37C2CB, brightness: dark)`** como base
+  (el diseño es dark-first) + variante clara. `AppColors` ThemeExtension con los semánticos de dinero.
+  Los valores exactos salen de los tokens de `BMONI.dc.html`.
 - **`AppColors` (ThemeExtension)** con los colores semánticos que M3 no cubre:
   `positive` (recibe USD), `negative`/`fee`, `warning` (quote por expirar). Se resuelven por brillo
   del tema; los widgets leen `Theme.of(context).extension<AppColors>()`, nunca hex.

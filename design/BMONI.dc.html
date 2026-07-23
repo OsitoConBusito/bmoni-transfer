@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  a{color:#37C2CB;text-decoration:none}
+  a:hover{color:#5AD3DB}
+  @keyframes bmshim{0%{background-position:-320px 0}100%{background-position:320px 0}}
+  @keyframes bmspin{to{transform:rotate(360deg)}}
+  @keyframes bmquote{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes bmpulse{0%,100%{opacity:1}50%{opacity:.45}}
+  @keyframes bmpop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0B0F14;padding:72px 64px 120px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#E7ECF1">
+
+  <header style="max-width:1100px;margin:0 auto 72px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:26px">
+      <div style="width:46px;height:46px;border-radius:13px;background:linear-gradient(150deg,#37C2CB,#0F7A82);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:24px;color:#04262A">b</div>
+      <div style="font-family:'Space Grotesk';font-weight:700;font-size:26px;letter-spacing:-.5px">BMONI</div>
+      <div style="margin-left:8px;padding:5px 12px;border-radius:999px;background:rgba(55,194,203,.14);color:#5AD3DB;font-size:12px;font-weight:600;letter-spacing:.3px">Experiencia México · MXN → USD</div>
+    </div>
+    <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:44px;line-height:1.05;letter-spacing:-1.2px;max-width:820px;margin-bottom:18px">Envía dinero de México a dólares, en segundos y al tipo de cambio real.</h1>
+    <p style="font-size:17px;line-height:1.6;color:#9AA6B2;max-width:640px">Sistema de UI de alta fidelidad — tema claro y oscuro, tokens listos para Material 3 / Flutter, y el flujo completo: bienvenida, monto, confirmación y resultado.</p>
+  </header>
+
+  <!-- ============ TOKENS ============ -->
+  <section style="max-width:1100px;margin:0 auto 96px">
+    <div style="font-family:'Space Grotesk';font-size:13px;font-weight:600;letter-spacing:2px;color:#5AD3DB;margin-bottom:8px">01 · SISTEMA DE DISEÑO</div>
+    <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.6px;margin-bottom:8px">Tokens</h2>
+    <p style="color:#9AA6B2;font-size:15px;margin-bottom:36px;max-width:620px">Paleta, tipografía, spacing y radios — mapeables directo a un <code style="font-family:'Space Grotesk';color:#C9D3DD">ThemeExtension</code> de Flutter. Semánticos de dinero con contraste AA en claro y oscuro.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px">
+      <!-- LIGHT palette -->
+      <div style="background:#12181F;border:1px solid #212C36;border-radius:20px;padding:26px">
+        <div style="font-weight:700;font-size:15px;margin-bottom:20px;display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;border-radius:50%;background:#FBFAF7;border:1px solid #55606C"></span>Tema claro</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div><div style="height:56px;border-radius:12px;background:#0F7A82;border:1px solid rgba(255,255,255,.08)"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">primary</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#0F7A82</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#D6EEF0"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">primary-container</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#D6EEF0</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#1A8A4E"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">positive</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#1A8A4E</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#C64A3B"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">fee / negative</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#C64A3B</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#C98A18"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">warning</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#C98A18</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#FBFAF7;border:1px solid #2A343E"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">background</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#FBFAF7</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#FFFFFF;border:1px solid #2A343E"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">surface</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#FFFFFF</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#1C2530"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">on-surface</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#1C2530</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#E7E3DB"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">outline</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#E7E3DB</div></div>
+        </div>
+      </div>
+      <!-- DARK palette -->
+      <div style="background:#12181F;border:1px solid #212C36;border-radius:20px;padding:26px">
+        <div style="font-weight:700;font-size:15px;margin-bottom:20px;display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;border-radius:50%;background:#12181F;border:1px solid #55606C"></span>Tema oscuro</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div><div style="height:56px;border-radius:12px;background:#37C2CB"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">primary</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#37C2CB</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#0E3B40"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">primary-container</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#0E3B40</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#46C97E"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">positive</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#46C97E</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#F0806F"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">fee / negative</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#F0806F</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#E8B84B"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">warning</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#E8B84B</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#12181F;border:1px solid #2A343E"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">background</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#12181F</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#1A222B;border:1px solid #2A343E"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">surface</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#1A222B</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#F3F5F7"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">on-surface</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#F3F5F7</div></div>
+          <div><div style="height:56px;border-radius:12px;background:#33404D"></div><div style="font-size:11px;color:#9AA6B2;margin-top:6px">outline</div><div style="font-size:11px;font-family:'Space Grotesk';color:#6B7683">#33404D</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:24px">
+      <!-- Type scale -->
+      <div style="background:#12181F;border:1px solid #212C36;border-radius:20px;padding:26px">
+        <div style="font-weight:700;font-size:15px;margin-bottom:22px">Escala tipográfica</div>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid #212C36;padding-bottom:16px"><span style="font-family:'Space Grotesk';font-weight:600;font-size:44px;letter-spacing:-1px;font-variant-numeric:tabular-nums">$5,000.00</span><span style="font-size:12px;color:#6B7683;text-align:right">display-amount<br>Space Grotesk 600 · 44/48</span></div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid #212C36;padding-bottom:16px"><span style="font-family:'Space Grotesk';font-weight:700;font-size:24px">Confirma tu envío</span><span style="font-size:12px;color:#6B7683;text-align:right">title · Space Grotesk 700 · 24/30</span></div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid #212C36;padding-bottom:16px"><span style="font-size:16px">Tu familia recibe en minutos.</span><span style="font-size:12px;color:#6B7683;text-align:right">body · Jakarta 400 · 16/24</span></div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px"><span style="font-size:13px;color:#9AA6B2">1 USD = 18.50 MXN</span><span style="font-size:12px;color:#6B7683;text-align:right">caption-rate · Jakarta 500 · 13/18</span></div>
+        </div>
+      </div>
+      <!-- Spacing + radii -->
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div style="background:#12181F;border:1px solid #212C36;border-radius:20px;padding:26px">
+          <div style="font-weight:700;font-size:15px;margin-bottom:18px">Spacing</div>
+          <div style="display:flex;align-items:flex-end;gap:14px">
+            <div style="text-align:center"><div style="width:4px;height:4px;background:#37C2CB;margin:0 auto 8px"></div><span style="font-size:11px;color:#6B7683">4</span></div>
+            <div style="text-align:center"><div style="width:8px;height:8px;background:#37C2CB;margin:0 auto 8px"></div><span style="font-size:11px;color:#6B7683">8</span></div>
+            <div style="text-align:center"><div style="width:16px;height:16px;background:#37C2CB;margin:0 auto 8px"></div><span style="font-size:11px;color:#6B7683">16</span></div>
+            <div style="text-align:center"><div style="width:24px;height:24px;background:#37C2CB;margin:0 auto 8px"></div><span style="font-size:11px;color:#6B7683">24</span></div>
+            <div style="text-align:center"><div style="width:32px;height:32px;background:#37C2CB;margin:0 auto 8px"></div><span style="font-size:11px;color:#6B7683">32</span></div>
+          </div>
+        </div>
+        <div style="background:#12181F;border:1px solid #212C36;border-radius:20px;padding:26px">
+          <div style="font-weight:700;font-size:15px;margin-bottom:18px">Radios</div>
+          <div style="display:flex;gap:16px">
+            <div style="text-align:center"><div style="width:52px;height:52px;border:1.5px solid #37C2CB;border-radius:8px;margin-bottom:8px"></div><span style="font-size:11px;color:#6B7683">sm · 8</span></div>
+            <div style="text-align:center"><div style="width:52px;height:52px;border:1.5px solid #37C2CB;border-radius:12px;margin-bottom:8px"></div><span style="font-size:11px;color:#6B7683">md · 12</span></div>
+            <div style="text-align:center"><div style="width:52px;height:52px;border:1.5px solid #37C2CB;border-radius:16px;margin-bottom:8px"></div><span style="font-size:11px;color:#6B7683">lg · 16</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ONBOARDING ============ -->
+  <section style="max-width:1400px;margin:0 auto 96px">
+    <div style="font-family:'Space Grotesk';font-size:13px;font-weight:600;letter-spacing:2px;color:#5AD3DB;margin-bottom:8px">02 · ONBOARDING</div>
+    <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.6px;margin-bottom:8px">El gancho · 4 variantes</h2>
+    <p style="color:#9AA6B2;font-size:15px;margin-bottom:40px;max-width:640px">Cuatro ángulos para los primeros 3 segundos. Mi recomendación: <strong style="color:#E7ECF1">Variante A (tipo de cambio real)</strong> como principal, con <strong style="color:#E7ECF1">C (confianza)</strong> como segunda pantalla del carrusel.</p>
+    <div id="onbrow" style="display:flex;flex-wrap:wrap;gap:56px">
+
+  <!-- VARIANT A -->
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">A · Tipo de cambio real <span style="font-size:12px;color:#5AD3DB;font-weight:600;margin-left:6px">recomendada</span></div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Ángulo: ahorro y transparencia</div></div>
+    <div style="display:flex;gap:26px">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="flex:1;margin:6px 16px 0;border-radius:28px;background:repeating-linear-gradient(135deg,#E9E5DD 0 12px,#F3F1EC 12px 24px);position:relative;overflow:hidden;min-height:0">
+              <div style="position:absolute;top:22px;left:0;right:0;text-align:center;font-family:'Space Grotesk';font-weight:700;font-size:22px;letter-spacing:-.5px;padding:0 30px;color:#1C2530">Envía pesos,<br>que reciban dólares.</div>
+              <div style="position:absolute;top:120px;left:0;right:0;text-align:center;font-family:ui-monospace,monospace;font-size:11px;color:#8A8578">ilustración · mapa MX → EE.UU.</div>
+              <div style="position:absolute;left:18px;right:18px;bottom:18px;background:#FFFFFF;border-radius:18px;padding:15px 17px;box-shadow:0 14px 34px -14px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:space-between">
+                <div><div style="font-size:12px;color:#5A6472;font-weight:500">Tipo de cambio hoy</div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;margin-top:3px;font-variant-numeric:tabular-nums">1 USD = 18.50 MXN</div></div>
+                <div style="background:#DCF3E5;color:#1A8A4E;font-size:11px;font-weight:700;padding:6px 10px;border-radius:999px">en vivo</div>
+              </div>
+            </div>
+            <div style="padding:24px 26px 4px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#0F7A82;margin-bottom:10px">SIN SORPRESAS</div>
+              <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:25px;line-height:1.15;letter-spacing:-.5px;margin-bottom:10px">El dólar real, sin letras chiquitas.</h3>
+              <p style="font-size:15px;line-height:1.55;color:#5A6472">Ves el tipo de cambio del mercado y la comisión exacta antes de enviar.</p>
+              <div style="display:flex;gap:7px;margin:22px 0 16px"><div style="width:22px;height:6px;border-radius:3px;background:#0F7A82"></div><div style="width:6px;height:6px;border-radius:3px;background:#D9D4CA"></div><div style="width:6px;height:6px;border-radius:3px;background:#D9D4CA"></div><div style="width:6px;height:6px;border-radius:3px;background:#D9D4CA"></div></div>
+              <div style="background:#0F7A82;color:#fff;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(15,122,130,.7)">Empezar gratis</div>
+              <div style="height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#5A6472">Ya tengo cuenta</div>
+            </div>
+          </div>
+          <div style="height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Claro</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="flex:1;margin:6px 16px 0;border-radius:28px;background:repeating-linear-gradient(135deg,#1E2833 0 12px,#232E39 12px 24px);position:relative;overflow:hidden;min-height:0">
+              <div style="position:absolute;top:22px;left:0;right:0;text-align:center;font-family:'Space Grotesk';font-weight:700;font-size:22px;letter-spacing:-.5px;padding:0 30px;color:#F3F5F7">Envía pesos,<br>que reciban dólares.</div>
+              <div style="position:absolute;top:120px;left:0;right:0;text-align:center;font-family:ui-monospace,monospace;font-size:11px;color:#6B7683">ilustración · mapa MX → EE.UU.</div>
+              <div style="position:absolute;left:18px;right:18px;bottom:18px;background:#1A222B;border-radius:18px;padding:15px 17px;box-shadow:0 14px 34px -14px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:space-between;border:1px solid #263039">
+                <div><div style="font-size:12px;color:#A2AEBB;font-weight:500">Tipo de cambio hoy</div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;margin-top:3px;font-variant-numeric:tabular-nums">1 USD = 18.50 MXN</div></div>
+                <div style="background:#123028;color:#46C97E;font-size:11px;font-weight:700;padding:6px 10px;border-radius:999px">en vivo</div>
+              </div>
+            </div>
+            <div style="padding:24px 26px 4px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#37C2CB;margin-bottom:10px">SIN SORPRESAS</div>
+              <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:25px;line-height:1.15;letter-spacing:-.5px;margin-bottom:10px">El dólar real, sin letras chiquitas.</h3>
+              <p style="font-size:15px;line-height:1.55;color:#A2AEBB">Ves el tipo de cambio del mercado y la comisión exacta antes de enviar.</p>
+              <div style="display:flex;gap:7px;margin:22px 0 16px"><div style="width:22px;height:6px;border-radius:3px;background:#37C2CB"></div><div style="width:6px;height:6px;border-radius:3px;background:#33404D"></div><div style="width:6px;height:6px;border-radius:3px;background:#33404D"></div><div style="width:6px;height:6px;border-radius:3px;background:#33404D"></div></div>
+              <div style="background:#37C2CB;color:#04262A;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(55,194,203,.5)">Empezar gratis</div>
+              <div style="height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#A2AEBB">Ya tengo cuenta</div>
+            </div>
+          </div>
+          <div style="height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Oscuro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VARIANT B -->
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">B · Velocidad</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Ángulo: llega en minutos</div></div>
+    <div style="display:flex;gap:26px">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="flex:1;margin:6px 16px 0;border-radius:28px;background:linear-gradient(160deg,#0F7A82,#0C666D);position:relative;overflow:hidden;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-family:ui-monospace,monospace;font-size:11px;color:rgba(255,255,255,.6);position:absolute;top:22px">ilustración · movimiento</div>
+              <div style="font-family:'Space Grotesk';font-weight:700;font-size:72px;letter-spacing:-2px;color:#fff;line-height:1">2 min</div>
+              <div style="color:rgba(255,255,255,.85);font-size:15px;margin-top:6px;font-weight:500">tiempo promedio de entrega</div>
+              <div style="display:flex;gap:6px;margin-top:22px;align-items:center">
+                <div style="width:9px;height:9px;border-radius:50%;background:#fff"></div><div style="width:34px;height:2px;background:rgba(255,255,255,.5)"></div><div style="width:9px;height:9px;border-radius:50%;background:#fff"></div><div style="width:34px;height:2px;background:rgba(255,255,255,.5)"></div><div style="width:9px;height:9px;border-radius:50%;background:#DCF3E5"></div>
+              </div>
+            </div>
+            <div style="padding:24px 26px 4px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#0F7A82;margin-bottom:10px">RÁPIDO DE VERDAD</div>
+              <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:25px;line-height:1.15;letter-spacing:-.5px;margin-bottom:10px">Llega en minutos, no en días.</h3>
+              <p style="font-size:15px;line-height:1.55;color:#5A6472">Envía a una tarjeta o wallet en EE.UU. y que esté disponible casi al instante.</p>
+              <div style="display:flex;gap:7px;margin:22px 0 16px"><div style="width:22px;height:6px;border-radius:3px;background:#0F7A82"></div><div style="width:6px;height:6px;border-radius:3px;background:#D9D4CA"></div><div style="width:6px;height:6px;border-radius:3px;background:#D9D4CA"></div><div style="width:6px;height:6px;border-radius:3px;background:#D9D4CA"></div></div>
+              <div style="background:#0F7A82;color:#fff;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(15,122,130,.7)">Empezar gratis</div>
+              <div style="height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#5A6472">Ya tengo cuenta</div>
+            </div>
+          </div>
+          <div style="height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Claro</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="flex:1;margin:6px 16px 0;border-radius:28px;background:linear-gradient(160deg,#0E3B40,#0A2A2E);position:relative;overflow:hidden;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-family:ui-monospace,monospace;font-size:11px;color:rgba(255,255,255,.4);position:absolute;top:22px">ilustración · movimiento</div>
+              <div style="font-family:'Space Grotesk';font-weight:700;font-size:72px;letter-spacing:-2px;color:#37C2CB;line-height:1">2 min</div>
+              <div style="color:#A2AEBB;font-size:15px;margin-top:6px;font-weight:500">tiempo promedio de entrega</div>
+              <div style="display:flex;gap:6px;margin-top:22px;align-items:center">
+                <div style="width:9px;height:9px;border-radius:50%;background:#37C2CB"></div><div style="width:34px;height:2px;background:rgba(55,194,203,.4)"></div><div style="width:9px;height:9px;border-radius:50%;background:#37C2CB"></div><div style="width:34px;height:2px;background:rgba(55,194,203,.4)"></div><div style="width:9px;height:9px;border-radius:50%;background:#46C97E"></div>
+              </div>
+            </div>
+            <div style="padding:24px 26px 4px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#37C2CB;margin-bottom:10px">RÁPIDO DE VERDAD</div>
+              <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:25px;line-height:1.15;letter-spacing:-.5px;margin-bottom:10px">Llega en minutos, no en días.</h3>
+              <p style="font-size:15px;line-height:1.55;color:#A2AEBB">Envía a una tarjeta o wallet en EE.UU. y que esté disponible casi al instante.</p>
+              <div style="display:flex;gap:7px;margin:22px 0 16px"><div style="width:22px;height:6px;border-radius:3px;background:#37C2CB"></div><div style="width:6px;height:6px;border-radius:3px;background:#33404D"></div><div style="width:6px;height:6px;border-radius:3px;background:#33404D"></div><div style="width:6px;height:6px;border-radius:3px;background:#33404D"></div></div>
+              <div style="background:#37C2CB;color:#04262A;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(55,194,203,.5)">Empezar gratis</div>
+              <div style="height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#A2AEBB">Ya tengo cuenta</div>
+            </div>
+          </div>
+          <div style="height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Oscuro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VARIANT C -->
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">C · Confianza y seguridad</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Ángulo: regulado y protegido</div></div>
+    <div style="display:flex;gap:26px">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="flex:1;margin:6px 16px 0;border-radius:28px;background:#D6EEF0;position:relative;overflow:hidden;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px">
+              <div style="font-family:ui-monospace,monospace;font-size:11px;color:#5E8A8E;position:absolute;top:22px">ilustración · escudo</div>
+              <div style="width:104px;height:104px;border-radius:30px;background:#0F7A82;display:flex;align-items:center;justify-content:center;color:#fff;font-size:52px;box-shadow:0 18px 34px -14px rgba(15,122,130,.6)">✓</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 24px">
+                <span style="background:#fff;color:#0C4B50;font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px">Regulado</span>
+                <span style="background:#fff;color:#0C4B50;font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px">Cifrado 256-bit</span>
+                <span style="background:#fff;color:#0C4B50;font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px">Monitoreo 24/7</span>
+              </div>
+            </div>
+            <div style="padding:24px 26px 4px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#0F7A82;margin-bottom:10px">SEGURO Y REGULADO</div>
+              <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:25px;line-height:1.15;letter-spacing:-.5px;margin-bottom:10px">Protegido de punta a punta.</h3>
+              <p style="font-size:15px;line-height:1.55;color:#5A6472">Cifrado, verificación y respaldo en cada envío. Tú siempre en control.</p>
+              <div style="display:flex;gap:7px;margin:22px 0 16px"><div style="width:22px;height:6px;border-radius:3px;background:#0F7A82"></div><div style="width:6px;height:6px;border-radius:3px;background:#D9D4CA"></div><div style="width:6px;height:6px;border-radius:3px;background:#D9D4CA"></div><div style="width:6px;height:6px;border-radius:3px;background:#D9D4CA"></div></div>
+              <div style="background:#0F7A82;color:#fff;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(15,122,130,.7)">Crear mi cuenta</div>
+              <div style="height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#5A6472">Ya tengo cuenta</div>
+            </div>
+          </div>
+          <div style="height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Claro</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="flex:1;margin:6px 16px 0;border-radius:28px;background:#0E3B40;position:relative;overflow:hidden;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px">
+              <div style="font-family:ui-monospace,monospace;font-size:11px;color:#5E8A8E;position:absolute;top:22px">ilustración · escudo</div>
+              <div style="width:104px;height:104px;border-radius:30px;background:#37C2CB;display:flex;align-items:center;justify-content:center;color:#04262A;font-size:52px;box-shadow:0 18px 34px -14px rgba(0,0,0,.5)">✓</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:0 24px">
+                <span style="background:#1A222B;color:#9FE7EC;font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px">Regulado</span>
+                <span style="background:#1A222B;color:#9FE7EC;font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px">Cifrado 256-bit</span>
+                <span style="background:#1A222B;color:#9FE7EC;font-size:12px;font-weight:600;padding:8px 13px;border-radius:999px">Monitoreo 24/7</span>
+              </div>
+            </div>
+            <div style="padding:24px 26px 4px">
+              <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#37C2CB;margin-bottom:10px">SEGURO Y REGULADO</div>
+              <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:25px;line-height:1.15;letter-spacing:-.5px;margin-bottom:10px">Protegido de punta a punta.</h3>
+              <p style="font-size:15px;line-height:1.55;color:#A2AEBB">Cifrado, verificación y respaldo en cada envío. Tú siempre en control.</p>
+              <div style="display:flex;gap:7px;margin:22px 0 16px"><div style="width:22px;height:6px;border-radius:3px;background:#37C2CB"></div><div style="width:6px;height:6px;border-radius:3px;background:#33404D"></div><div style="width:6px;height:6px;border-radius:3px;background:#33404D"></div><div style="width:6px;height:6px;border-radius:3px;background:#33404D"></div></div>
+              <div style="background:#37C2CB;color:#04262A;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(55,194,203,.5)">Crear mi cuenta</div>
+              <div style="height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#A2AEBB">Ya tengo cuenta</div>
+            </div>
+          </div>
+          <div style="height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Oscuro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VARIANT D -->
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">D · Emocional / familia</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Ángulo: a quién ayudas</div></div>
+    <div style="display:flex;gap:26px">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7);position:relative">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,#E9E5DD 0 14px,#F3F1EC 14px 28px)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(28,37,48,.05) 40%,rgba(28,37,48,.86) 100%)"></div>
+          <div style="position:absolute;top:170px;left:0;right:0;text-align:center;font-family:ui-monospace,monospace;font-size:11px;color:#8A8578">foto · familia recibiendo apoyo</div>
+          <div style="position:relative;z-index:2;height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;color:#1C2530;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="position:relative;z-index:2;flex:1"></div>
+          <div style="position:relative;z-index:2;padding:0 26px 4px;color:#fff">
+            <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#8CE0C4;margin-bottom:10px">PARA LOS TUYOS</div>
+            <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;line-height:1.1;letter-spacing:-.8px;margin-bottom:12px">Para quienes cuentan contigo.</h3>
+            <p style="font-size:15px;line-height:1.55;color:rgba(255,255,255,.85);margin-bottom:20px">Manda apoyo a tu familia en EE.UU. de forma simple, cálida y sin complicaciones.</p>
+            <div style="display:flex;gap:7px;margin-bottom:16px"><div style="width:22px;height:6px;border-radius:3px;background:#fff"></div><div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.4)"></div><div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.4)"></div><div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.4)"></div></div>
+            <div style="background:#fff;color:#0F7A82;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Enviar mi primer apoyo</div>
+            <div style="height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:rgba(255,255,255,.8)">Ya tengo cuenta</div>
+          </div>
+          <div style="position:relative;z-index:2;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:#fff;opacity:.5"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Claro</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8);position:relative">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,#1E2833 0 14px,#232E39 14px 28px)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,14,18,.2) 30%,rgba(10,14,18,.92) 100%)"></div>
+          <div style="position:absolute;top:170px;left:0;right:0;text-align:center;font-family:ui-monospace,monospace;font-size:11px;color:#6B7683">foto · familia recibiendo apoyo</div>
+          <div style="position:relative;z-index:2;height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;color:#F3F5F7;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="position:relative;z-index:2;flex:1"></div>
+          <div style="position:relative;z-index:2;padding:0 26px 4px;color:#fff">
+            <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;color:#46C97E;margin-bottom:10px">PARA LOS TUYOS</div>
+            <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;line-height:1.1;letter-spacing:-.8px;margin-bottom:12px">Para quienes cuentan contigo.</h3>
+            <p style="font-size:15px;line-height:1.55;color:rgba(255,255,255,.82);margin-bottom:20px">Manda apoyo a tu familia en EE.UU. de forma simple, cálida y sin complicaciones.</p>
+            <div style="display:flex;gap:7px;margin-bottom:16px"><div style="width:22px;height:6px;border-radius:3px;background:#37C2CB"></div><div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.3)"></div><div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.3)"></div><div style="width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.3)"></div></div>
+            <div style="background:#37C2CB;color:#04262A;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Enviar mi primer apoyo</div>
+            <div style="height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:rgba(255,255,255,.8)">Ya tengo cuenta</div>
+          </div>
+          <div style="position:relative;z-index:2;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:#fff;opacity:.4"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Oscuro</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+  </section>
+
+  <!-- sections appended below -->
+  <div id="flows" style="max-width:1400px;margin:0 auto">
+
+  <!-- ============ AMOUNT ENTRY ============ -->
+  <section style="margin-bottom:96px">
+    <div style="font-family:'Space Grotesk';font-size:13px;font-weight:600;letter-spacing:2px;color:#5AD3DB;margin-bottom:8px">03 · ENTRADA DE MONTO</div>
+    <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.6px;margin-bottom:8px">Cotización en vivo · 5 estados</h2>
+    <p style="color:#9AA6B2;font-size:15px;margin-bottom:40px;max-width:640px">El monto es el héroe. Debajo, el equivalente en USD, el tipo de cambio y la comisión se actualizan en vivo.</p>
+    <div id="amountrow" style="display:flex;flex-wrap:wrap;gap:56px">
+
+  <!-- STATE A · IDLE -->
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">a · Vacío / idle</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Sin monto aún · CTA deshabilitado</div></div>
+    <div style="display:flex;gap:26px">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#F3F1EC;display:flex;align-items:center;justify-content:center;font-size:22px;color:#1C2530">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Enviar dinero</div><div style="width:40px;height:40px"></div></div>
+          <div style="margin:12px 20px 0;padding:11px 13px;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:11px;background:#D6EEF0;color:#0C4B50;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:14px">ML</div><div style="flex:1"><div style="font-size:11px;color:#5A6472">Para</div><div style="font-weight:700;font-size:14px">María López · Wallet ···· 4821</div></div><div style="color:#0F7A82;font-size:13px;font-weight:600">Cambiar</div></div>
+          <div style="padding:26px 20px 10px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#5A6472;margin-bottom:6px">TÚ ENVÍAS · MXN</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:56px;letter-spacing:-2px;color:#C4BEB2;font-variant-numeric:tabular-nums">$0.00</div></div>
+          <div style="margin:0 20px;padding:18px;border:1px dashed #DAD5CB;border-radius:18px;text-align:center;color:#8A8578;font-size:14px;line-height:1.5">Escribe un monto para ver cuánto recibe María en dólares.</div>
+          <div style="flex:1"></div>
+          <div style="margin:0 20px 10px;height:54px;border-radius:16px;background:#EAE6DE;color:#B0AA9D;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Continuar</div>
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr)"><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">1</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">2</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">3</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">4</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">5</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">6</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">7</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">8</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">9</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#8A8578">.</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">0</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8A8578">⌫</div></div>
+          <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Claro</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#232E39;display:flex;align-items:center;justify-content:center;font-size:22px;color:#F3F5F7">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Enviar dinero</div><div style="width:40px;height:40px"></div></div>
+          <div style="margin:12px 20px 0;padding:11px 13px;background:#1A222B;border:1px solid #263039;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:11px;background:#0E3B40;color:#9FE7EC;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:14px">ML</div><div style="flex:1"><div style="font-size:11px;color:#A2AEBB">Para</div><div style="font-weight:700;font-size:14px">María López · Wallet ···· 4821</div></div><div style="color:#37C2CB;font-size:13px;font-weight:600">Cambiar</div></div>
+          <div style="padding:26px 20px 10px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#A2AEBB;margin-bottom:6px">TÚ ENVÍAS · MXN</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:56px;letter-spacing:-2px;color:#3D4A57;font-variant-numeric:tabular-nums">$0.00</div></div>
+          <div style="margin:0 20px;padding:18px;border:1px dashed #33404D;border-radius:18px;text-align:center;color:#8593A0;font-size:14px;line-height:1.5">Escribe un monto para ver cuánto recibe María en dólares.</div>
+          <div style="flex:1"></div>
+          <div style="margin:0 20px 10px;height:54px;border-radius:16px;background:#222B34;color:#5A6675;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Continuar</div>
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr)"><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">1</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">2</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">3</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">4</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">5</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">6</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">7</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">8</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">9</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#8593A0">.</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">0</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8593A0">⌫</div></div>
+          <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Oscuro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE B · LOADING -->
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">b · Cargando cotización</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Skeleton + spinner sutil</div></div>
+    <div style="display:flex;gap:26px">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#F3F1EC;display:flex;align-items:center;justify-content:center;font-size:22px;color:#1C2530">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Enviar dinero</div><div style="width:40px;height:40px"></div></div>
+          <div style="margin:12px 20px 0;padding:11px 13px;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:11px;background:#D6EEF0;color:#0C4B50;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:14px">ML</div><div style="flex:1"><div style="font-size:11px;color:#5A6472">Para</div><div style="font-weight:700;font-size:14px">María López · Wallet ···· 4821</div></div><div style="color:#0F7A82;font-size:13px;font-weight:600">Cambiar</div></div>
+          <div style="padding:26px 20px 10px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#5A6472;margin-bottom:4px">TÚ ENVÍAS · MXN</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:54px;letter-spacing:-2px;font-variant-numeric:tabular-nums;display:flex;align-items:center;justify-content:center;gap:2px"><span>$5,000.00</span><span style="width:3px;height:42px;background:#0F7A82;border-radius:2px;animation:bmpulse 1s infinite"></span></div></div>
+          <div style="margin:0 20px;padding:16px 18px;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:18px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;color:#5A6472;font-size:13px;font-weight:500"><div style="width:15px;height:15px;border:2px solid #D6EEF0;border-top-color:#0F7A82;border-radius:50%;animation:bmspin .8s linear infinite"></div>Actualizando cotización…</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="width:80px;height:12px;border-radius:6px;background:linear-gradient(90deg,#EFEBE3 25%,#F8F5EF 50%,#EFEBE3 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div><div style="width:120px;height:12px;border-radius:6px;background:linear-gradient(90deg,#EFEBE3 25%,#F8F5EF 50%,#EFEBE3 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="width:64px;height:12px;border-radius:6px;background:linear-gradient(90deg,#EFEBE3 25%,#F8F5EF 50%,#EFEBE3 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div><div style="width:90px;height:12px;border-radius:6px;background:linear-gradient(90deg,#EFEBE3 25%,#F8F5EF 50%,#EFEBE3 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div></div>
+            <div style="height:1px;background:#EDE9E1;margin-bottom:14px"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div style="width:90px;height:14px;border-radius:7px;background:linear-gradient(90deg,#EFEBE3 25%,#F8F5EF 50%,#EFEBE3 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div><div style="width:130px;height:26px;border-radius:8px;background:linear-gradient(90deg,#E4EFE8 25%,#EFF7F1 50%,#E4EFE8 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div></div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="margin:0 20px 10px;height:54px;border-radius:16px;background:#EAE6DE;color:#B0AA9D;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Continuar</div>
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr)"><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">1</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">2</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">3</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">4</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">5</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">6</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">7</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">8</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">9</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#8A8578">.</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">0</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8A8578">⌫</div></div>
+          <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Claro</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#232E39;display:flex;align-items:center;justify-content:center;font-size:22px;color:#F3F5F7">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Enviar dinero</div><div style="width:40px;height:40px"></div></div>
+          <div style="margin:12px 20px 0;padding:11px 13px;background:#1A222B;border:1px solid #263039;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:11px;background:#0E3B40;color:#9FE7EC;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:14px">ML</div><div style="flex:1"><div style="font-size:11px;color:#A2AEBB">Para</div><div style="font-weight:700;font-size:14px">María López · Wallet ···· 4821</div></div><div style="color:#37C2CB;font-size:13px;font-weight:600">Cambiar</div></div>
+          <div style="padding:26px 20px 10px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#A2AEBB;margin-bottom:4px">TÚ ENVÍAS · MXN</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:54px;letter-spacing:-2px;font-variant-numeric:tabular-nums;display:flex;align-items:center;justify-content:center;gap:2px"><span>$5,000.00</span><span style="width:3px;height:42px;background:#37C2CB;border-radius:2px;animation:bmpulse 1s infinite"></span></div></div>
+          <div style="margin:0 20px;padding:16px 18px;background:#1A222B;border:1px solid #263039;border-radius:18px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;color:#A2AEBB;font-size:13px;font-weight:500"><div style="width:15px;height:15px;border:2px solid #0E3B40;border-top-color:#37C2CB;border-radius:50%;animation:bmspin .8s linear infinite"></div>Actualizando cotización…</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="width:80px;height:12px;border-radius:6px;background:linear-gradient(90deg,#232E39 25%,#2C3946 50%,#232E39 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div><div style="width:120px;height:12px;border-radius:6px;background:linear-gradient(90deg,#232E39 25%,#2C3946 50%,#232E39 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="width:64px;height:12px;border-radius:6px;background:linear-gradient(90deg,#232E39 25%,#2C3946 50%,#232E39 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div><div style="width:90px;height:12px;border-radius:6px;background:linear-gradient(90deg,#232E39 25%,#2C3946 50%,#232E39 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div></div>
+            <div style="height:1px;background:#263039;margin-bottom:14px"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div style="width:90px;height:14px;border-radius:7px;background:linear-gradient(90deg,#232E39 25%,#2C3946 50%,#232E39 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div><div style="width:130px;height:26px;border-radius:8px;background:linear-gradient(90deg,#123028 25%,#18402F 50%,#123028 75%);background-size:320px 100%;animation:bmshim 1.2s infinite linear"></div></div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="margin:0 20px 10px;height:54px;border-radius:16px;background:#222B34;color:#5A6675;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Continuar</div>
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr)"><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">1</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">2</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">3</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">4</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">5</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">6</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">7</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">8</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">9</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#8593A0">.</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">0</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8593A0">⌫</div></div>
+          <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Oscuro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE C · QUOTE READY -->
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">c · Cotización lista</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Aparece con transición · CTA activo</div></div>
+    <div style="display:flex;gap:26px">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#F3F1EC;display:flex;align-items:center;justify-content:center;font-size:22px;color:#1C2530">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Enviar dinero</div><div style="width:40px;height:40px"></div></div>
+          <div style="margin:12px 20px 0;padding:11px 13px;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:11px;background:#D6EEF0;color:#0C4B50;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:14px">ML</div><div style="flex:1"><div style="font-size:11px;color:#5A6472">Para</div><div style="font-weight:700;font-size:14px">María López · Wallet ···· 4821</div></div><div style="color:#0F7A82;font-size:13px;font-weight:600">Cambiar</div></div>
+          <div style="padding:26px 20px 10px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#5A6472;margin-bottom:4px">TÚ ENVÍAS · MXN</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:54px;letter-spacing:-2px;font-variant-numeric:tabular-nums;display:flex;align-items:center;justify-content:center;gap:2px"><span>$5,000.00</span><span style="width:3px;height:42px;background:#0F7A82;border-radius:2px;animation:bmpulse 1s infinite"></span></div></div>
+          <div style="margin:0 20px;padding:16px 18px;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:18px;animation:bmquote .35s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px"><span style="font-size:14px;color:#5A6472">Tipo de cambio</span><span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600"><span style="width:7px;height:7px;border-radius:50%;background:#1A8A4E"></span>1 USD = 18.50 MXN</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><span style="font-size:14px;color:#5A6472">Comisión</span><span style="font-size:14px;font-weight:600;color:#C64A3B">−$45.00 MXN</span></div>
+            <div style="height:1px;background:#EDE9E1;margin-bottom:14px"></div>
+            <div style="display:flex;align-items:flex-end;justify-content:space-between"><span style="font-size:14px;color:#5A6472;font-weight:600">María recibe</span><span style="font-family:'Space Grotesk';font-weight:700;font-size:26px;color:#1A8A4E;font-variant-numeric:tabular-nums">$267.84 USD</span></div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="margin:0 20px 10px;height:54px;border-radius:16px;background:#0F7A82;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(15,122,130,.6)">Continuar</div>
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr)"><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">1</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">2</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">3</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">4</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">5</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">6</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">7</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">8</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">9</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#8A8578">.</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">0</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8A8578">⌫</div></div>
+          <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Claro</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#232E39;display:flex;align-items:center;justify-content:center;font-size:22px;color:#F3F5F7">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Enviar dinero</div><div style="width:40px;height:40px"></div></div>
+          <div style="margin:12px 20px 0;padding:11px 13px;background:#1A222B;border:1px solid #263039;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:11px;background:#0E3B40;color:#9FE7EC;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:14px">ML</div><div style="flex:1"><div style="font-size:11px;color:#A2AEBB">Para</div><div style="font-weight:700;font-size:14px">María López · Wallet ···· 4821</div></div><div style="color:#37C2CB;font-size:13px;font-weight:600">Cambiar</div></div>
+          <div style="padding:26px 20px 10px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#A2AEBB;margin-bottom:4px">TÚ ENVÍAS · MXN</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:54px;letter-spacing:-2px;font-variant-numeric:tabular-nums;display:flex;align-items:center;justify-content:center;gap:2px"><span>$5,000.00</span><span style="width:3px;height:42px;background:#37C2CB;border-radius:2px;animation:bmpulse 1s infinite"></span></div></div>
+          <div style="margin:0 20px;padding:16px 18px;background:#1A222B;border:1px solid #263039;border-radius:18px;animation:bmquote .35s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px"><span style="font-size:14px;color:#A2AEBB">Tipo de cambio</span><span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600"><span style="width:7px;height:7px;border-radius:50%;background:#46C97E"></span>1 USD = 18.50 MXN</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><span style="font-size:14px;color:#A2AEBB">Comisión</span><span style="font-size:14px;font-weight:600;color:#F0806F">−$45.00 MXN</span></div>
+            <div style="height:1px;background:#263039;margin-bottom:14px"></div>
+            <div style="display:flex;align-items:flex-end;justify-content:space-between"><span style="font-size:14px;color:#A2AEBB;font-weight:600">María recibe</span><span style="font-family:'Space Grotesk';font-weight:700;font-size:26px;color:#46C97E;font-variant-numeric:tabular-nums">$267.84 USD</span></div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="margin:0 20px 10px;height:54px;border-radius:16px;background:#37C2CB;color:#04262A;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(55,194,203,.4)">Continuar</div>
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr)"><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">1</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">2</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">3</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">4</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">5</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">6</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">7</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">8</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">9</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#8593A0">.</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">0</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8593A0">⌫</div></div>
+          <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Oscuro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE D · INVALID -->
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">d · Monto inválido</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Fuera de rango · error inline</div></div>
+    <div style="display:flex;gap:26px">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#F3F1EC;display:flex;align-items:center;justify-content:center;font-size:22px;color:#1C2530">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Enviar dinero</div><div style="width:40px;height:40px"></div></div>
+          <div style="margin:12px 20px 0;padding:11px 13px;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:11px;background:#D6EEF0;color:#0C4B50;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:14px">ML</div><div style="flex:1"><div style="font-size:11px;color:#5A6472">Para</div><div style="font-weight:700;font-size:14px">María López · Wallet ···· 4821</div></div><div style="color:#0F7A82;font-size:13px;font-weight:600">Cambiar</div></div>
+          <div style="padding:26px 20px 6px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#5A6472;margin-bottom:4px">TÚ ENVÍAS · MXN</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:54px;letter-spacing:-2px;color:#C64A3B;font-variant-numeric:tabular-nums;display:flex;align-items:center;justify-content:center;gap:2px"><span>$5.00</span><span style="width:3px;height:42px;background:#C64A3B;border-radius:2px;animation:bmpulse 1s infinite"></span></div></div>
+          <div style="margin:10px 20px 0;padding:12px 14px;background:#FBEBE8;border:1px solid #F1C9C2;border-radius:14px;display:flex;gap:10px;align-items:flex-start;color:#A63A2D;font-size:13px;line-height:1.45"><span style="width:18px;height:18px;border-radius:50%;background:#C64A3B;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">!</span><span>El monto mínimo por envío es <strong>$10.00 MXN</strong>. El máximo es $100,000.00 MXN.</span></div>
+          <div style="flex:1"></div>
+          <div style="margin:0 20px 10px;height:54px;border-radius:16px;background:#EAE6DE;color:#B0AA9D;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Continuar</div>
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr)"><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">1</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">2</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">3</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">4</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">5</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">6</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">7</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">8</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">9</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#8A8578">.</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">0</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8A8578">⌫</div></div>
+          <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Claro</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#232E39;display:flex;align-items:center;justify-content:center;font-size:22px;color:#F3F5F7">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Enviar dinero</div><div style="width:40px;height:40px"></div></div>
+          <div style="margin:12px 20px 0;padding:11px 13px;background:#1A222B;border:1px solid #263039;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:11px;background:#0E3B40;color:#9FE7EC;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:14px">ML</div><div style="flex:1"><div style="font-size:11px;color:#A2AEBB">Para</div><div style="font-weight:700;font-size:14px">María López · Wallet ···· 4821</div></div><div style="color:#37C2CB;font-size:13px;font-weight:600">Cambiar</div></div>
+          <div style="padding:26px 20px 6px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#A2AEBB;margin-bottom:4px">TÚ ENVÍAS · MXN</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:54px;letter-spacing:-2px;color:#F0806F;font-variant-numeric:tabular-nums;display:flex;align-items:center;justify-content:center;gap:2px"><span>$5.00</span><span style="width:3px;height:42px;background:#F0806F;border-radius:2px;animation:bmpulse 1s infinite"></span></div></div>
+          <div style="margin:10px 20px 0;padding:12px 14px;background:#2E1A17;border:1px solid #4A2620;border-radius:14px;display:flex;gap:10px;align-items:flex-start;color:#F0806F;font-size:13px;line-height:1.45"><span style="width:18px;height:18px;border-radius:50%;background:#F0806F;color:#2E1A17;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">!</span><span>El monto mínimo por envío es <strong>$10.00 MXN</strong>. El máximo es $100,000.00 MXN.</span></div>
+          <div style="flex:1"></div>
+          <div style="margin:0 20px 10px;height:54px;border-radius:16px;background:#222B34;color:#5A6675;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Continuar</div>
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr)"><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">1</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">2</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">3</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">4</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">5</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">6</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">7</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">8</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">9</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#8593A0">.</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">0</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8593A0">⌫</div></div>
+          <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Oscuro</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE E · NETWORK ERROR -->
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">e · Error de red</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">No se pudo cotizar · reintento</div></div>
+    <div style="display:flex;gap:26px">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#F3F1EC;display:flex;align-items:center;justify-content:center;font-size:22px;color:#1C2530">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Enviar dinero</div><div style="width:40px;height:40px"></div></div>
+          <div style="margin:12px 20px 0;padding:11px 13px;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:11px;background:#D6EEF0;color:#0C4B50;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:14px">ML</div><div style="flex:1"><div style="font-size:11px;color:#5A6472">Para</div><div style="font-weight:700;font-size:14px">María López · Wallet ···· 4821</div></div><div style="color:#0F7A82;font-size:13px;font-weight:600">Cambiar</div></div>
+          <div style="padding:26px 20px 10px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#5A6472;margin-bottom:4px">TÚ ENVÍAS · MXN</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:54px;letter-spacing:-2px;font-variant-numeric:tabular-nums">$5,000.00</div></div>
+          <div style="margin:0 20px;padding:22px 18px;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:18px;text-align:center">
+            <div style="width:48px;height:48px;border-radius:50%;background:#FBEDD3;color:#C98A18;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin:0 auto 14px">!</div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:5px;font-family:'Space Grotesk'">No pudimos obtener el tipo de cambio</div>
+            <div style="color:#5A6472;font-size:13px;line-height:1.5;margin-bottom:16px">Revisa tu conexión a internet e inténtalo de nuevo.</div>
+            <div style="display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 22px;border:1.5px solid #0F7A82;color:#0F7A82;border-radius:12px;font-weight:700;font-size:15px"><span style="font-size:17px">↻</span>Reintentar</div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="margin:0 20px 10px;height:54px;border-radius:16px;background:#EAE6DE;color:#B0AA9D;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Continuar</div>
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr)"><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">1</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">2</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">3</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">4</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">5</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">6</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">7</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">8</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">9</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#8A8578">.</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">0</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8A8578">⌫</div></div>
+          <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Claro</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+          <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+          <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#232E39;display:flex;align-items:center;justify-content:center;font-size:22px;color:#F3F5F7">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Enviar dinero</div><div style="width:40px;height:40px"></div></div>
+          <div style="margin:12px 20px 0;padding:11px 13px;background:#1A222B;border:1px solid #263039;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:11px;background:#0E3B40;color:#9FE7EC;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:14px">ML</div><div style="flex:1"><div style="font-size:11px;color:#A2AEBB">Para</div><div style="font-weight:700;font-size:14px">María López · Wallet ···· 4821</div></div><div style="color:#37C2CB;font-size:13px;font-weight:600">Cambiar</div></div>
+          <div style="padding:26px 20px 10px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#A2AEBB;margin-bottom:4px">TÚ ENVÍAS · MXN</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:54px;letter-spacing:-2px;font-variant-numeric:tabular-nums">$5,000.00</div></div>
+          <div style="margin:0 20px;padding:22px 18px;background:#1A222B;border:1px solid #263039;border-radius:18px;text-align:center">
+            <div style="width:48px;height:48px;border-radius:50%;background:#3A2E14;color:#E8B84B;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin:0 auto 14px">!</div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:5px;font-family:'Space Grotesk'">No pudimos obtener el tipo de cambio</div>
+            <div style="color:#A2AEBB;font-size:13px;line-height:1.5;margin-bottom:16px">Revisa tu conexión a internet e inténtalo de nuevo.</div>
+            <div style="display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 22px;border:1.5px solid #37C2CB;color:#37C2CB;border-radius:12px;font-weight:700;font-size:15px"><span style="font-size:17px">↻</span>Reintentar</div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="margin:0 20px 10px;height:54px;border-radius:16px;background:#222B34;color:#5A6675;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">Continuar</div>
+          <div style="padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr)"><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">1</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">2</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">3</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">4</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">5</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">6</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">7</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">8</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">9</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px;color:#8593A0">.</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:22px">0</div><div style="height:42px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#8593A0">⌫</div></div>
+          <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+        </div>
+        <span style="font-size:12px;color:#6B7683">Oscuro</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+  </section>
+
+  <!-- ============ CONFIRMATION ============ -->
+  <section style="margin-bottom:96px">
+    <div style="font-family:'Space Grotesk';font-size:13px;font-weight:600;letter-spacing:2px;color:#5AD3DB;margin-bottom:8px">04 · CONFIRMACIÓN</div>
+    <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.6px;margin-bottom:8px">Desglose + expiración de cotización</h2>
+    <p style="color:#9AA6B2;font-size:15px;margin-bottom:40px;max-width:640px">Desglose escaneable con contador de 60s. Al expirar, el usuario vuelve a cotizar. El botón bloquea el doble toque durante el envío.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:56px">
+
+      <!-- CONFIRM · VIGENTE (light idle / dark sending) -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">Cotización vigente</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Claro: contador activo · Oscuro: enviando</div></div>
+        <div style="display:flex;gap:26px">
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+              <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+              <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#F3F1EC;display:flex;align-items:center;justify-content:center;font-size:22px;color:#1C2530">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Confirma tu envío</div><div style="width:40px;height:40px"></div></div>
+              <div style="padding:16px 20px 4px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#5A6472;margin-bottom:4px">VAS A ENVIAR</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:44px;letter-spacing:-1.5px;font-variant-numeric:tabular-nums">$5,000.00 <span style="font-size:20px;color:#5A6472">MXN</span></div></div>
+              <div style="margin:12px 20px 0;padding:14px 16px;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:18px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px"><span style="color:#5A6472">Comisión</span><span style="font-weight:600;color:#C64A3B">−$45.00 MXN</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px"><span style="color:#5A6472">Se convierten</span><span style="font-weight:600">$4,955.00 MXN</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:14px"><span style="color:#5A6472">Tipo de cambio</span><span style="font-weight:600">1 USD = 18.50 MXN</span></div>
+                <div style="height:1px;background:#EDE9E1;margin-bottom:14px"></div>
+                <div style="display:flex;align-items:flex-end;justify-content:space-between"><span style="font-size:14px;color:#5A6472;font-weight:600">María recibe</span><span style="font-family:'Space Grotesk';font-weight:700;font-size:28px;color:#1A8A4E;font-variant-numeric:tabular-nums">$267.84 USD</span></div>
+              </div>
+              <div style="margin:12px 20px 0;padding:12px 14px;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:11px;background:#D6EEF0;color:#0C4B50;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:13px">ML</div><div style="flex:1"><div style="font-weight:700;font-size:14px">María López</div><div style="font-size:12px;color:#5A6472">Wallet ···· 4821 · Estados Unidos</div></div></div>
+              <div style="margin:12px 20px 0;padding:12px 14px;background:#FBEDD3;border:1px solid #F0DBA6;border-radius:14px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:#8A6410;font-weight:500">Este tipo de cambio se mantiene por</span><span style="font-family:'Space Grotesk';font-weight:700;font-size:16px;color:#B47A0E;font-variant-numeric:tabular-nums">00:47</span></div><div style="height:5px;border-radius:3px;background:#F0DBA6;overflow:hidden"><div style="width:78%;height:100%;background:#C98A18;border-radius:3px"></div></div></div>
+              <div style="flex:1"></div>
+              <div style="margin:0 20px 14px;height:56px;border-radius:16px;background:#0F7A82;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(15,122,130,.6)">Confirmar y enviar</div>
+              <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+            </div>
+            <span style="font-size:12px;color:#6B7683">Claro</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+              <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+              <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#232E39;display:flex;align-items:center;justify-content:center;font-size:22px;color:#F3F5F7">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Confirma tu envío</div><div style="width:40px;height:40px"></div></div>
+              <div style="padding:16px 20px 4px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#A2AEBB;margin-bottom:4px">VAS A ENVIAR</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:44px;letter-spacing:-1.5px;font-variant-numeric:tabular-nums">$5,000.00 <span style="font-size:20px;color:#A2AEBB">MXN</span></div></div>
+              <div style="margin:12px 20px 0;padding:14px 16px;background:#1A222B;border:1px solid #263039;border-radius:18px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px"><span style="color:#A2AEBB">Comisión</span><span style="font-weight:600;color:#F0806F">−$45.00 MXN</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px"><span style="color:#A2AEBB">Se convierten</span><span style="font-weight:600">$4,955.00 MXN</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:14px"><span style="color:#A2AEBB">Tipo de cambio</span><span style="font-weight:600">1 USD = 18.50 MXN</span></div>
+                <div style="height:1px;background:#263039;margin-bottom:14px"></div>
+                <div style="display:flex;align-items:flex-end;justify-content:space-between"><span style="font-size:14px;color:#A2AEBB;font-weight:600">María recibe</span><span style="font-family:'Space Grotesk';font-weight:700;font-size:28px;color:#46C97E;font-variant-numeric:tabular-nums">$267.84 USD</span></div>
+              </div>
+              <div style="margin:12px 20px 0;padding:12px 14px;background:#1A222B;border:1px solid #263039;border-radius:16px;display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:11px;background:#0E3B40;color:#9FE7EC;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Space Grotesk';font-size:13px">ML</div><div style="flex:1"><div style="font-weight:700;font-size:14px">María López</div><div style="font-size:12px;color:#A2AEBB">Wallet ···· 4821 · Estados Unidos</div></div></div>
+              <div style="margin:12px 20px 0;padding:12px 14px;background:#2C2A16;border:1px solid #4A431F;border-radius:14px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:#D9C77E;font-weight:500">Este tipo de cambio se mantiene por</span><span style="font-family:'Space Grotesk';font-weight:700;font-size:16px;color:#E8B84B;font-variant-numeric:tabular-nums">00:47</span></div><div style="height:5px;border-radius:3px;background:#4A431F;overflow:hidden"><div style="width:78%;height:100%;background:#E8B84B;border-radius:3px"></div></div></div>
+              <div style="flex:1"></div>
+              <div style="margin:0 20px 14px;height:56px;border-radius:16px;background:#2A8E95;color:#04262A;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:700;font-size:16px;opacity:.92"><div style="width:18px;height:18px;border:2.4px solid rgba(4,38,42,.35);border-top-color:#04262A;border-radius:50%;animation:bmspin .8s linear infinite"></div>Enviando…</div>
+              <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+            </div>
+            <span style="font-size:12px;color:#6B7683">Oscuro · enviando</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIRM · EXPIRADA -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">Cotización expirada</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Contador en 00:00 · volver a cotizar</div></div>
+        <div style="display:flex;gap:26px">
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+              <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+              <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#F3F1EC;display:flex;align-items:center;justify-content:center;font-size:22px;color:#1C2530">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Confirma tu envío</div><div style="width:40px;height:40px"></div></div>
+              <div style="padding:16px 20px 4px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#5A6472;margin-bottom:4px">VAS A ENVIAR</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:44px;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;color:#9A948A">$5,000.00 <span style="font-size:20px">MXN</span></div></div>
+              <div style="margin:12px 20px 0;padding:14px 16px;background:#F6F4EF;border:1px solid #E7E3DB;border-radius:18px;opacity:.75">
+                <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px"><span style="color:#8A8578">Comisión</span><span style="font-weight:600;color:#8A8578">−$45.00 MXN</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:14px"><span style="color:#8A8578">Tipo de cambio</span><span style="font-weight:600;color:#8A8578">1 USD = 18.50 MXN</span></div>
+                <div style="height:1px;background:#EDE9E1;margin-bottom:14px"></div>
+                <div style="display:flex;align-items:flex-end;justify-content:space-between"><span style="font-size:14px;color:#8A8578;font-weight:600">María recibe</span><span style="font-family:'Space Grotesk';font-weight:700;font-size:28px;color:#9A948A;font-variant-numeric:tabular-nums">$267.84 USD</span></div>
+              </div>
+              <div style="margin:14px 20px 0;padding:14px 16px;background:#FBEBE8;border:1px solid #F1C9C2;border-radius:14px;display:flex;gap:10px;align-items:flex-start;color:#A63A2D;font-size:13px;line-height:1.45"><span style="width:18px;height:18px;border-radius:50%;background:#C64A3B;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">!</span><span>La cotización expiró. El tipo de cambio pudo haber cambiado — vuelve a cotizar para continuar.</span></div>
+              <div style="flex:1"></div>
+              <div style="margin:0 20px 14px;height:56px;border-radius:16px;background:#0F7A82;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(15,122,130,.6)"><span style="font-size:18px">↻</span>Volver a cotizar</div>
+              <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+            </div>
+            <span style="font-size:12px;color:#6B7683">Claro</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+              <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+              <div style="padding:2px 20px 0;display:flex;align-items:center;justify-content:space-between"><div style="width:40px;height:40px;border-radius:12px;background:#232E39;display:flex;align-items:center;justify-content:center;font-size:22px;color:#F3F5F7">‹</div><div style="font-weight:700;font-size:16px;font-family:'Space Grotesk'">Confirma tu envío</div><div style="width:40px;height:40px"></div></div>
+              <div style="padding:16px 20px 4px;text-align:center"><div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#A2AEBB;margin-bottom:4px">VAS A ENVIAR</div><div style="font-family:'Space Grotesk';font-weight:600;font-size:44px;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;color:#5A6675">$5,000.00 <span style="font-size:20px">MXN</span></div></div>
+              <div style="margin:12px 20px 0;padding:14px 16px;background:#161D25;border:1px solid #263039;border-radius:18px;opacity:.7">
+                <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px"><span style="color:#6B7683">Comisión</span><span style="font-weight:600;color:#6B7683">−$45.00 MXN</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:14px"><span style="color:#6B7683">Tipo de cambio</span><span style="font-weight:600;color:#6B7683">1 USD = 18.50 MXN</span></div>
+                <div style="height:1px;background:#263039;margin-bottom:14px"></div>
+                <div style="display:flex;align-items:flex-end;justify-content:space-between"><span style="font-size:14px;color:#6B7683;font-weight:600">María recibe</span><span style="font-family:'Space Grotesk';font-weight:700;font-size:28px;color:#5A6675;font-variant-numeric:tabular-nums">$267.84 USD</span></div>
+              </div>
+              <div style="margin:14px 20px 0;padding:14px 16px;background:#2E1A17;border:1px solid #4A2620;border-radius:14px;display:flex;gap:10px;align-items:flex-start;color:#F0806F;font-size:13px;line-height:1.45"><span style="width:18px;height:18px;border-radius:50%;background:#F0806F;color:#2E1A17;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">!</span><span>La cotización expiró. El tipo de cambio pudo haber cambiado — vuelve a cotizar para continuar.</span></div>
+              <div style="flex:1"></div>
+              <div style="margin:0 20px 14px;height:56px;border-radius:16px;background:#37C2CB;color:#04262A;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(55,194,203,.4)"><span style="font-size:18px">↻</span>Volver a cotizar</div>
+              <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+            </div>
+            <span style="font-size:12px;color:#6B7683">Oscuro</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ RESULT ============ -->
+  <section style="margin-bottom:40px">
+    <div style="font-family:'Space Grotesk';font-size:13px;font-weight:600;letter-spacing:2px;color:#5AD3DB;margin-bottom:8px">05 · RESULTADO</div>
+    <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.6px;margin-bottom:8px">Éxito y fallo</h2>
+    <p style="color:#9AA6B2;font-size:15px;margin-bottom:40px;max-width:640px">Cierre con sensación de logro y un resumen claro; el fallo explica la causa y ofrece reintento sin culpar al usuario.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:56px">
+
+      <!-- SUCCESS -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">Éxito</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Resumen + folio · sensación de logro</div></div>
+        <div style="display:flex;gap:26px">
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+              <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 30px 0;text-align:center;min-height:0">
+                <div style="width:92px;height:92px;border-radius:50%;background:#DCF3E5;display:flex;align-items:center;justify-content:center;margin-top:14px;animation:bmpop .5s cubic-bezier(.2,.9,.3,1.4)"><div style="width:66px;height:66px;border-radius:50%;background:#1A8A4E;color:#fff;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700">✓</div></div>
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:27px;margin-top:22px;letter-spacing:-.5px">¡Enviado!</div>
+                <div style="color:#5A6472;font-size:15px;margin-top:8px">María López recibirá</div>
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:40px;color:#1A8A4E;margin-top:4px;font-variant-numeric:tabular-nums;letter-spacing:-1px">$267.84 USD</div>
+                <div style="display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:7px 13px;background:#D6EEF0;color:#0C4B50;border-radius:999px;font-size:13px;font-weight:600"><span style="width:7px;height:7px;border-radius:50%;background:#1A8A4E"></span>Disponible en ~2 minutos</div>
+                <div style="margin-top:24px;width:100%;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:18px;padding:6px 16px;text-align:left">
+                  <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #EDE9E1;font-size:14px"><span style="color:#5A6472">Folio</span><span style="font-weight:600;font-family:'Space Grotesk'">BM-8F3K2Q</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #EDE9E1;font-size:14px"><span style="color:#5A6472">Enviaste</span><span style="font-weight:600">$5,000.00 MXN</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:11px 0;font-size:14px"><span style="color:#5A6472">Fecha</span><span style="font-weight:600">22 jul 2026, 9:41</span></div>
+                </div>
+              </div>
+              <div style="margin:0 20px 10px;height:56px;border-radius:16px;background:#0F7A82;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(15,122,130,.6)">Ver recibo</div>
+              <div style="margin:0 20px 6px;height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#5A6472">Enviar otro</div>
+              <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+            </div>
+            <span style="font-size:12px;color:#6B7683">Claro</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+              <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 30px 0;text-align:center;min-height:0">
+                <div style="width:92px;height:92px;border-radius:50%;background:#123028;display:flex;align-items:center;justify-content:center;margin-top:14px;animation:bmpop .5s cubic-bezier(.2,.9,.3,1.4)"><div style="width:66px;height:66px;border-radius:50%;background:#46C97E;color:#052A1B;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700">✓</div></div>
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:27px;margin-top:22px;letter-spacing:-.5px">¡Enviado!</div>
+                <div style="color:#A2AEBB;font-size:15px;margin-top:8px">María López recibirá</div>
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:40px;color:#46C97E;margin-top:4px;font-variant-numeric:tabular-nums;letter-spacing:-1px">$267.84 USD</div>
+                <div style="display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:7px 13px;background:#0E3B40;color:#9FE7EC;border-radius:999px;font-size:13px;font-weight:600"><span style="width:7px;height:7px;border-radius:50%;background:#46C97E"></span>Disponible en ~2 minutos</div>
+                <div style="margin-top:24px;width:100%;background:#1A222B;border:1px solid #263039;border-radius:18px;padding:6px 16px;text-align:left">
+                  <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #263039;font-size:14px"><span style="color:#A2AEBB">Folio</span><span style="font-weight:600;font-family:'Space Grotesk'">BM-8F3K2Q</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #263039;font-size:14px"><span style="color:#A2AEBB">Enviaste</span><span style="font-weight:600">$5,000.00 MXN</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:11px 0;font-size:14px"><span style="color:#A2AEBB">Fecha</span><span style="font-weight:600">22 jul 2026, 9:41</span></div>
+                </div>
+              </div>
+              <div style="margin:0 20px 10px;height:56px;border-radius:16px;background:#37C2CB;color:#04262A;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(55,194,203,.4)">Ver recibo</div>
+              <div style="margin:0 20px 6px;height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#A2AEBB">Enviar otro</div>
+              <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+            </div>
+            <span style="font-size:12px;color:#6B7683">Oscuro</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAILURE -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#E7ECF1">Fallo</div><div style="color:#9AA6B2;font-size:13px;margin-top:3px">Causa clara · sin cobro · reintento</div></div>
+        <div style="display:flex;gap:26px">
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#FBFAF7;color:#1C2530;border:1px solid #E7E3DB;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+              <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 30px 0;text-align:center;min-height:0">
+                <div style="width:92px;height:92px;border-radius:50%;background:#FBEBE8;display:flex;align-items:center;justify-content:center;margin-top:14px"><div style="width:66px;height:66px;border-radius:50%;background:#C64A3B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700">✕</div></div>
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:25px;margin-top:22px;letter-spacing:-.5px;line-height:1.2">No se pudo completar<br>el envío</div>
+                <div style="color:#5A6472;font-size:15px;margin-top:10px;line-height:1.55">Tu banco rechazó el cargo. <strong style="color:#1C2530">No te cobramos nada</strong> — puedes intentar de nuevo o usar otro método.</div>
+                <div style="margin-top:22px;width:100%;background:#FFFFFF;border:1px solid #E7E3DB;border-radius:18px;padding:6px 16px;text-align:left">
+                  <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #EDE9E1;font-size:14px"><span style="color:#5A6472">Código</span><span style="font-weight:600;font-family:'Space Grotesk'">ERR-BANK-51</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:11px 0;font-size:14px"><span style="color:#5A6472">Intento</span><span style="font-weight:600">22 jul 2026, 9:41</span></div>
+                </div>
+              </div>
+              <div style="margin:0 20px 10px;height:56px;border-radius:16px;background:#0F7A82;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(15,122,130,.6)"><span style="font-size:18px">↻</span>Reintentar</div>
+              <div style="margin:0 20px 6px;height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#5A6472">Cambiar método de pago</div>
+              <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+            </div>
+            <span style="font-size:12px;color:#6B7683">Claro</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div style="width:376px;height:812px;flex-shrink:0;border-radius:42px;overflow:hidden;display:flex;flex-direction:column;background:#12181F;color:#F3F5F7;border:1px solid #263039;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)">
+              <div style="height:46px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:700;flex-shrink:0"><span>9:41</span><div style="display:flex;gap:6px;align-items:center"><div style="display:flex;gap:2px;align-items:flex-end;height:10px"><div style="width:3px;height:5px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:7px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:9px;background:currentColor;border-radius:1px"></div><div style="width:3px;height:10px;background:currentColor;border-radius:1px"></div></div><div style="width:20px;height:10px;border:1.4px solid currentColor;border-radius:3px;padding:1.4px"><div style="width:65%;height:100%;background:currentColor;border-radius:1px"></div></div></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 30px 0;text-align:center;min-height:0">
+                <div style="width:92px;height:92px;border-radius:50%;background:#2E1A17;display:flex;align-items:center;justify-content:center;margin-top:14px"><div style="width:66px;height:66px;border-radius:50%;background:#F0806F;color:#2E1A17;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700">✕</div></div>
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:25px;margin-top:22px;letter-spacing:-.5px;line-height:1.2">No se pudo completar<br>el envío</div>
+                <div style="color:#A2AEBB;font-size:15px;margin-top:10px;line-height:1.55">Tu banco rechazó el cargo. <strong style="color:#F3F5F7">No te cobramos nada</strong> — puedes intentar de nuevo o usar otro método.</div>
+                <div style="margin-top:22px;width:100%;background:#1A222B;border:1px solid #263039;border-radius:18px;padding:6px 16px;text-align:left">
+                  <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #263039;font-size:14px"><span style="color:#A2AEBB">Código</span><span style="font-weight:600;font-family:'Space Grotesk'">ERR-BANK-51</span></div>
+                  <div style="display:flex;justify-content:space-between;padding:11px 0;font-size:14px"><span style="color:#A2AEBB">Intento</span><span style="font-weight:600">22 jul 2026, 9:41</span></div>
+                </div>
+              </div>
+              <div style="margin:0 20px 10px;height:56px;border-radius:16px;background:#37C2CB;color:#04262A;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:16px;box-shadow:0 12px 24px -10px rgba(55,194,203,.4)"><span style="font-size:18px">↻</span>Reintentar</div>
+              <div style="margin:0 20px 6px;height:44px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;color:#A2AEBB">Cambiar método de pago</div>
+              <div style="height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:130px;height:5px;border-radius:3px;background:currentColor;opacity:.22"></div></div>
+            </div>
+            <span style="font-size:12px;color:#6B7683">Oscuro</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+</div>
+</x-dc>
+</body>
+</html>
