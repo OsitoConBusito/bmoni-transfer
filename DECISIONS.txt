@@ -109,40 +109,38 @@ With more time, in priority order:
 --------------------------------------------------------------------------------
 
 The brief scopes this at 2-3h. My own active time — reviewing each PR,
-directing the work, verifying on-device, giving feedback — was **~3-4h**,
-close to that scope.
+directing the work, verifying on-device, giving feedback — landed at
+**~3h estimated / ~3h50m actual**, close to that scope. Each row below is
+the time I was actually engaged with that unit of work, not wall-clock
+elapsed while the AI executed autonomously between check-ins.
 
-The table below tracks something different: session/build duration per PR,
-which includes stretches where the AI executed autonomously between my
-check-ins, across multiple sessions spread over more than one day. Summed
-up it comes to ~14h40m estimated / ~18h30m of that cumulative time — not
-hours I sat continuously working, but still a real signal of where the
-build concentrated effort. The frontend ran over its own estimates on Clean
-Arch reorg + codegen + reviewer-requested fixes, and a later design-fidelity
-pass (matching a Claude Design mockup closely — fonts, exact colors,
-page-transition animations) accounts for the biggest chunk. In hindsight,
-that pass chased a level of visual polish the brief explicitly says not to
-spend time on ("clean and usable beats pretty") — worth flagging honestly
-rather than absorbing quietly.
+Backend landed almost exactly on estimate — quick, mechanical reviews of
+well-scoped diffs. The frontend ran a bit over on Clean Arch reorg +
+reviewer-requested fixes. The real overrun is in the design-fidelity pass
+(#14): matching a Claude Design mockup closely (fonts, exact colors,
+page-transition animations) took several rounds of screenshot-and-fix —
+exactly the kind of polish the brief's "clean and usable beats pretty"
+says isn't necessary, and it shows in the time.
 
-PR#   Unit                                          Estimated  Session time
+PR#   Unit                                          Estimated  Active time
 ----  --------------------------------------------  ---------  --------
-#1    Design import + token extraction               20m        ~15m
-#2    Money + Rate value objects (integer math)       45m        ~40m
-#3    Tiered fee policy                                25m        ~20m
-#4    RateProvider (frankfurter+stub) + Clock+TTL      40m        ~35m
-#5    GET /quote (validation, pricing, Result→HTTP)    1h 15m     ~1h 10m
-#6    POST /transfers (3-layer idempotency + HMAC)     1h 30m     ~1h 25m
-#7    Flutter scaffold + themed core                   40m        ~45m
-#8    Core layer (Money, Result, dio, i18n)             50m        ~1h
-#9    Transfer domain + data                            1h 30m     ~2h
-#10   Presentation state (notifiers + providers)        1h         ~1h 45m
-#11   3 screens + go_router + DS                        2h         ~2h 40m
-#12   Localization fix (es delegates)                   —          ~15m
-#13   Docs: README + DECISIONS                          45m        ~40m
-#14   Design-fidelity pass + critical bug fixes         3h         ~5h
+#1    Design import + token extraction               5m         5m
+#2    Money + Rate value objects (integer math)       10m        10m
+#3    Tiered fee policy                                5m         5m
+#4    RateProvider (frankfurter+stub) + Clock+TTL      8m         8m
+#5    GET /quote (validation, pricing, Result→HTTP)    15m        15m
+#6    POST /transfers (3-layer idempotency + HMAC)     18m        18m
+#7    Flutter scaffold + themed core                   8m         8m
+#8    Core layer (Money, Result, dio, i18n)            10m        10m
+#9    Transfer domain + data                           15m        18m
+#10   Presentation state (notifiers + providers)       12m        15m
+#11   3 screens + go_router + DS                       20m        25m
+#12   Localization fix (es delegates)                  —          5m
+#13   Docs: README + DECISIONS                         8m         8m
+#14   Design-fidelity pass + critical bug fixes        35m        1h 10m
+#15   Brief audit + DECISIONS/README polish            10m        15m
 ----  --------------------------------------------  ---------  --------
-      TOTAL backend  (#2-6)                             ~4h 35m    ~4h 25m
-      TOTAL frontend (#7-12)                             ~6h 20m    ~8h 25m
-      TOTAL docs + polish (#13-14)                       ~3h 45m    ~5h 40m
-      TOTAL project (#2-14, excl. #1)                    ~14h 40m   ~18h 30m
+      TOTAL backend  (#2-6)                             56m        56m
+      TOTAL frontend (#7-12)                            1h 05m     1h 21m
+      TOTAL docs + polish (#13-15)                       53m        1h 33m
+      TOTAL project (#2-15, excl. #1)                    2h 54m     3h 50m
