@@ -1,0 +1,6 @@
+backend/node_modules/
+backend/dist/
+app/build/
+app/.dart_tool/
+.DS_Store
+*.log
