@@ -1,44 +1,60 @@
-# app — reglas (Flutter/Dart)
+# app — rules (Flutter/Dart)
 
-Reglas específicas del frontend. Cross-cutting (dinero, idempotencia) y contrato:
-ver [/CLAUDE.md](../CLAUDE.md) y [/.specs/features/mxn-usd-transfer.md](../.specs/features/mxn-usd-transfer.md).
+Frontend-specific rules. Cross-cutting invariants (money, idempotency) and
+the contract: see [/CLAUDE.md](../CLAUDE.md) and
+[/.specs/features/mxn-usd-transfer.md](../.specs/features/mxn-usd-transfer.md).
 
-## Arquitectura — Clean Arch domain-first, feature-first
-Una feature `transfer` con `domain / data / presentation` + `core/`. Árbol en § Arquitectura del spec.
-- `domain/` no importa `data` ni Flutter: entities, `TransferRepository` (interface), use cases.
-- `data/` DTOs, datasources HTTP, mappers, `TransferRepositoryImpl`. Los DTOs viven **solo** aquí.
-- `presentation/` providers Riverpod, pages, widgets. No salta a `data` directo.
+## Architecture — Clean Arch domain-first, feature-first
+One `transfer` feature with `domain / data / presentation` + `core/`. Tree
+in the spec's § Architecture.
+- `domain/` never imports `data` or Flutter: entities, `TransferRepository`
+  (interface), use cases.
+- `data/` — DTOs, HTTP datasources, mappers, `TransferRepositoryImpl`. DTOs
+  live **only** here.
+- `presentation/` — Riverpod providers, pages, widgets. Never jumps
+  straight to `data`.
 
-## Estado — Riverpod 3.0 con code generation
-- `@riverpod` para providers/notifiers. `ref.watch` en `build`, `ref.read` en callbacks.
-- Lógica de transformación en providers derivados, no en `build`.
-- **Nunca** mutar un provider de forma **síncrona** en `initState`/`didChangeDependencies`/`build`/
-  `dispose` (crashea: "modify a provider while the widget tree was building"). Diferir con
-  `addPostFrameCallback` (guard `mounted`) o registrar el listener en el constructor del controller.
-- `AsyncValue` mapea a loading / error / data.
+## State — Riverpod 3.0 with code generation
+- `@riverpod` for providers/notifiers. `ref.watch` in `build`, `ref.read`
+  in callbacks.
+- Transformation logic in derived providers, not in `build`.
+- **Never** mutate a provider **synchronously** in
+  `initState`/`didChangeDependencies`/`build`/`dispose` (it crashes: "modify
+  a provider while the widget tree was building"). Defer with
+  `addPostFrameCallback` (guarded by `mounted`) or register the listener in
+  the controller's constructor.
+- `AsyncValue` maps to loading / error / data.
 
-## Dinero y contrato
-- El rate/fee/USD llegan del BE y se mapean a `Money` en `data/`. El cliente **nunca** recalcula el
-  rate ni opera dinero con `double`.
+## Money and the contract
+- Rate/fee/USD come from the backend and get mapped to `Money` in `data/`.
+  The client **never** recomputes the rate or operates on money with
+  `double`.
 
-## Widgets y estados
-- Widgets siempre como clase (`StatelessWidget`/`StatefulWidget`), **nunca** `Widget _buildX()`.
-- Manejar SIEMPRE: loading, network error, input inválido/cero/negativo, quote expirada. Cada estado
-  con identidad (loading/error/expired/success) en su propio widget.
-- Barrera de doble-submit al confirmar (`isSubmitting` + botón deshabilitado).
+## Widgets and states
+- Widgets are always classes (`StatelessWidget`/`StatefulWidget`), **never**
+  a `Widget _buildX()` method.
+- ALWAYS handle: loading, network error, invalid/zero/negative input,
+  expired quote. Each state gets its own identity (loading/error/expired/
+  success) in its own widget.
+- Double-submit barrier on confirm (`isSubmitting` + disabled button).
 
-## Errores
-`Result<T>` propio (sealed class `Ok`/`Err`) — sin fpdart. `try/catch` solo en el datasource (borde).
+## Errors
+A custom `Result<T>` (sealed class `Ok`/`Err`) — no fpdart. `try/catch`
+only in the datasource (the boundary).
 
-## Base de UI — design system, i18n, theming (ver [/.specs/features/frontend-foundation.md](../.specs/features/frontend-foundation.md))
-- Consumir el DS de `core/design_system/` (tokens + widgets `AppButton`/`AppTextField`/`AppCard`/
-  `AppMoneyText`…). Cero magic numbers/hex en widgets: todo sale de tokens o del `ThemeExtension`.
-- **i18n con slang:** cero strings de UI hardcodeados; todo texto de `t.*`. Errores del BE se traducen
-  por `code`, nunca el `message` crudo del wire. Locales hoy: `en` + `es` (extensible con solo un archivo).
-- **Theming:** claro/oscuro desde `ColorScheme.fromSeed` + `AppColors` ThemeExtension (positive/negative/
-  warning). `ThemeMode.system` por defecto + toggle. Colores desde el theme, nunca hex inline.
+## UI foundation — design system, i18n, theming (see [/.specs/features/frontend-foundation.md](../.specs/features/frontend-foundation.md))
+- Consume the DS from `core/design_system/` (tokens + `AppButton`/
+  `AppTextField`/`AppCard`/`AppMoneyText`… widgets). Zero magic numbers/hex
+  in widgets: everything comes from tokens or the `ThemeExtension`.
+- **i18n with slang:** zero hardcoded UI strings; every string comes from
+  `t.*`. Backend errors are translated by `code`, never the raw wire
+  `message`. Locales today: `en` + `es` (extensible with a single file).
+- **Theming:** light/dark from `ColorScheme.fromSeed` + the `AppColors`
+  ThemeExtension (positive/negative/warning). `ThemeMode.system` by default
+  + a toggle. Colors always come from the theme, never inline hex.
 
-## Seguridad (ver [/.specs/features/security.md](../.specs/features/security.md))
-Sin secretos en el cliente. TLS obligatorio en prod (rechazar `http` no-localhost); **certificate
-pinning diferido** (decisión consciente por la ventana de evaluación — ver spec). La validación
-client-side es UX, no frontera: el BE es la autoridad. Build release ofuscado.
+## Security (see [/.specs/features/security.md](../.specs/features/security.md))
+No secrets on the client. TLS mandatory in prod (reject non-localhost
+`http`); **certificate pinning deferred** (a conscious decision given the
+evaluation window — see the spec). Client-side validation is UX, not the
+boundary: the backend is the authority. Obfuscated release build.
