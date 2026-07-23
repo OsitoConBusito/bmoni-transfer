@@ -12,3 +12,5 @@ linter:
     public_member_api_docs: false
     # The `flutter` sdk dependency conventionally leads the list.
     sort_pub_dependencies: false
+    # Conflicts with freezed's required `const X._()` + factory ordering.
+    sort_unnamed_constructors_first: false
