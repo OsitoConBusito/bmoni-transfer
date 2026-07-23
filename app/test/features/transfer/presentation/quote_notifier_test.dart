@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bmoni_transfer/core/error/failure.dart';
 import 'package:bmoni_transfer/core/money/currency.dart';
 import 'package:bmoni_transfer/core/money/money.dart';
@@ -71,5 +73,23 @@ void main() {
     final state = container.read(quoteProvider);
     expect(state.hasError, isTrue);
     expect(state.error, isA<RateUnavailableFailure>());
+  });
+
+  test('given the field is cleared mid-flight, then the stale reply is '
+      'ignored', () async {
+    final pending = Completer<Result<Quote>>();
+    when(() => repository.getQuote('1000'))
+        .thenAnswer((_) => pending.future);
+    final container = _containerWith(repository);
+
+    container.read(quoteProvider.notifier).onAmountChanged('1000');
+    await pumpEventQueue();
+    container.read(quoteProvider.notifier).onAmountChanged('');
+    pending.complete(Ok(_quote));
+    await pumpEventQueue();
+
+    final state = container.read(quoteProvider);
+    expect(state.hasValue, isTrue);
+    expect(state.value, isNull);
   });
 }

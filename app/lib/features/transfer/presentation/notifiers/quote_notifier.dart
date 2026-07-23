@@ -24,6 +24,8 @@ class QuoteNotifier extends _$QuoteNotifier {
   void onAmountChanged(String amount) {
     final trimmed = amount.trim();
     if (trimmed.isEmpty) {
+      // Invalidate any in-flight fetch so its stale reply is ignored.
+      _requestId++;
       _debouncer.cancel();
       state = const AsyncValue<Quote?>.data(null);
       return;
