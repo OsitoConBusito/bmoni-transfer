@@ -44,6 +44,15 @@ export class Money {
     return Money.ofMinor(negative ? -minor : minor, currency);
   }
 
+  /** Like fromMajor but returns null instead of throwing, for validation paths (errors as values). */
+  static tryFromMajor(major: string, currency: Currency): Money | null {
+    try {
+      return Money.fromMajor(major, currency);
+    } catch {
+      return null;
+    }
+  }
+
   /** Major-unit numeric view — for display/formatting only, never for further money math. */
   toMajor(): number {
     return this.minorUnits / minorUnitScale(this.currency);

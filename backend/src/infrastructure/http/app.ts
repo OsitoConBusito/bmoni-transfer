@@ -1,10 +1,12 @@
 import cors from "cors";
-import express, { type Express, Router } from "express";
+import express, { type Express } from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 import { type Config, corsOrigins } from "../../shared/config.js";
 import { logger } from "../../shared/logger.js";
+import type { AppDependencies } from "../composition-root.js";
+import { quoteRouter } from "./routes/quote.route.js";
 
 const MAX_BODY_BYTES = "16kb";
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -15,7 +17,7 @@ const RATE_LIMIT_MAX = 120;
  * Returned without listening so tests (supertest) can exercise it directly.
  * Feature routers are mounted under /api/v1 as they are implemented.
  */
-export const createApp = (config: Config): Express => {
+export const createApp = (config: Config, deps: AppDependencies): Express => {
   const app = express();
 
   app.use(helmet());
@@ -35,9 +37,7 @@ export const createApp = (config: Config): Express => {
     res.status(200).json({ status: "ok" });
   });
 
-  const apiV1 = Router();
-  // Feature routers mounted here: /api/v1/quote, /api/v1/transfers
-  app.use("/api/v1", apiV1);
+  app.use("/api/v1", quoteRouter(deps.getQuote));
 
   return app;
 };
