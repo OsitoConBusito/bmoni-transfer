@@ -7,6 +7,13 @@ export const ErrorCode = {
   AMOUNT_TOO_HIGH: "AMOUNT_TOO_HIGH",
   AMOUNT_BELOW_FEE: "AMOUNT_BELOW_FEE",
   RATE_UNAVAILABLE: "RATE_UNAVAILABLE",
+  QUOTE_ID_REQUIRED: "QUOTE_ID_REQUIRED",
+  IDEMPOTENCY_KEY_REQUIRED: "IDEMPOTENCY_KEY_REQUIRED",
+  QUOTE_NOT_FOUND: "QUOTE_NOT_FOUND",
+  QUOTE_EXPIRED: "QUOTE_EXPIRED",
+  QUOTE_ALREADY_USED: "QUOTE_ALREADY_USED",
+  IDEMPOTENCY_KEY_REUSED: "IDEMPOTENCY_KEY_REUSED",
+  QUOTE_TAMPERED: "QUOTE_TAMPERED",
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
@@ -33,6 +40,18 @@ export const validationError = (code: ErrorCode, message: string, field?: string
 
 export const unavailableError = (code: ErrorCode, message: string): AppError => ({
   kind: "unavailable",
+  code,
+  message,
+});
+
+export const notFoundError = (code: ErrorCode, message: string): AppError => ({
+  kind: "not_found",
+  code,
+  message,
+});
+
+export const conflictError = (code: ErrorCode, message: string): AppError => ({
+  kind: "conflict",
   code,
   message,
 });

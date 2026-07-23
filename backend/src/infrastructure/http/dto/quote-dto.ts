@@ -1,8 +1,5 @@
-import type { Money } from "../../../domain/money.js";
 import type { Quote } from "../../../domain/quote.js";
-
-/** Money on the wire: integer minor units + currency, never a decimal. */
-const moneyDto = (money: Money) => ({ minorUnits: money.minorUnits, currency: money.currency });
+import { moneyDto } from "./money-dto.js";
 
 /** Serializes a Quote to its HTTP response shape (see spec § Contrato de la API). */
 export const toQuoteResponse = (quote: Quote) => ({

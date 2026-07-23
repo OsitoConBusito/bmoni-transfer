@@ -7,6 +7,7 @@ import { type Config, corsOrigins } from "../../shared/config.js";
 import { logger } from "../../shared/logger.js";
 import type { AppDependencies } from "../composition-root.js";
 import { quoteRouter } from "./routes/quote.route.js";
+import { transferRouter } from "./routes/transfer.route.js";
 
 const MAX_BODY_BYTES = "16kb";
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -38,6 +39,7 @@ export const createApp = (config: Config, deps: AppDependencies): Express => {
   });
 
   app.use("/api/v1", quoteRouter(deps.getQuote));
+  app.use("/api/v1", transferRouter(deps.createTransfer));
 
   // Final safety net: unexpected errors are logged, never leaked. Clients get a curated envelope.
   app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
