@@ -31,4 +31,10 @@ best-effort con `logger.warn`. Nada de `catch` que trague el error sin log ni tr
 
 ## Storage
 In-memory detrás del port `Repository` (swappable a DB después). Estado: maps de quotes, transfers,
-idempotency keys, y quotes usadas. Caché de rate con TTL.
+idempotency keys, y quotes usadas. Caché de rate con TTL (sobre el port `Clock`).
+
+## Seguridad (ver [/.specs/features/security.md](../.specs/features/security.md))
+helmet + CORS allowlist (no wildcard) + express-rate-limit + límite de body + pino con redacción.
+Errores nunca filtran stack traces/internals: solo el envelope curado; los 500 se loguean, no se exponen.
+El monto no es editable: el cliente manda solo `quoteId`; el BE recalcula desde la quote guardada y
+valida su firma **HMAC** (secret server-side, nunca al cliente). Determinismo vía port `Clock`.

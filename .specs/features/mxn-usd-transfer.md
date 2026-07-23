@@ -40,9 +40,9 @@ lados; `try/catch` solo en el borde. Ver reglas en [/CLAUDE.md](../../CLAUDE.md)
 ### Backend — Hexagonal-light (ports & adapters)
 ```
 backend/src/
-├── domain/            money, rate, quote, transfer, fee; ports/ (RateProvider, repositories)
+├── domain/            money, rate, quote, transfer, fee; ports/ (RateProvider, Repository, Clock)
 ├── application/       get-quote.use-case, create-transfer.use-case  (devuelven Result)
-├── infrastructure/    http/ (handlers, router, error-map) · rate/ (frankfurter, stub, cached) · persistence/ (in-memory)
+├── infrastructure/    http/ (handlers, router, error-map, pino) · rate/ (frankfurter, stub, cached) · persistence/ (in-memory) · clock/ (system, fake)
 └── shared/            Result, errors, config
 ```
 Los **puertos** (`RateProvider`, `Repository`) hacen swappable el rate (stub↔real) y el storage
@@ -167,8 +167,13 @@ El `destAmount` se calcula sobre `(sourceAmount − fee)` (el fee se deduce del 
 - `MIN_AMOUNT_MXN = 10.00`, `MAX_AMOUNT_MXN = 100 000.00`.
 - Fuera de rango, cero, negativo, no-numérico, o `sourceAmount ≤ fee` → `400` con código accionable.
 
-### § Expiración de quote
+### § Expiración de quote y determinismo
 - TTL = **60s**. `POST /transfers` con una quote expirada → `409 QUOTE_EXPIRED`.
+- **Puerto `Clock`** (`now()`) inyectado en vez de `Date.now()` inline: el dominio no toca el reloj
+  global. `SystemClock` en prod, `FakeClock` en tests → la expiración se prueba de forma determinista
+  sin esperas reales. (Costura que suele faltar cuando se usa `Date.now()` directo.)
+- **Caché de rate:** TTL propio (`RATE_CACHE_TTL_MS`, default 60s) sobre el `Clock`. El quote no
+  dispara una llamada de red por request; en cold start la primera request llena la caché.
 
 ---
 
@@ -192,6 +197,10 @@ Reglas de conflicto:
 ---
 
 ## Contrato de la API
+
+Base path: **`/api/v1`** (versionado). Todos los paths de abajo cuelgan de ahí
+(ej. `GET /api/v1/quote`). Además `GET /health` → `200 { status: "ok" }` (sin versionar).
+CORS habilitado (permite correr el Flutter en web). Logger estructurado **pino** (nunca `console.log`).
 
 ### `GET /quote?amount=<MXN major>`
 `amount` en unidades mayores (ej. `1000.50`). El BE lo escala a centavos y valida.
@@ -251,7 +260,10 @@ El body **solo** lleva `quoteId`. El BE recupera la quote guardada, verifica exp
 Pantallas: **AmountEntry** → **Confirmation** → **Result**.
 
 ### AmountEntry
-- Input MXN; al teclear (con **debounce**) llama `GET /quote` → muestra USD, rate, fee en vivo.
+- Input MXN numérico; al teclear con **debounce ~400ms** llama `GET /quote` → muestra USD, rate, fee
+  en vivo. Cada request cancela la anterior (evita respuestas fuera de orden).
+- **Formato de dinero con `intl`:** MXN en locale `es_MX` (`$1,000.00`), USD en `en_US`. Nunca
+  concatenar strings de dinero a mano; el display sale de `Money.toMajor()` formateado por `intl`.
 - Estados: `idle` · `loading` (cotizando) · `data` (quote válida) · `error`
   (network/`RATE_UNAVAILABLE` → reintentar) · `invalid` (0/negativo/fuera de rango → mensaje inline).
 
@@ -304,6 +316,17 @@ Pantallas: **AmountEntry** → **Confirmation** → **Result**.
 - **CA-20:** Doble-tap en Confirmar → una sola llamada a `POST /transfers` (barrera de control).
 
 ---
+
+## Estrategia de tests (presupuesto concentrado donde el dominio castiga)
+
+No cobertura pareja; foco en las dos cosas evaluadas + los caminos de fallo.
+- **Backend (Vitest):** `Money` VO exhaustivo (half-up, sin doble redondeo, rechazo de floats) ·
+  fee escalonado (los ejemplos de CA-2) · idempotencia (CA-8: dos POST = un transfer; CA-9/10/11) ·
+  use cases con `FakeClock` + `StubRateProvider` (expiración determinista) · un puñado de tests de
+  integración de los endpoints (supertest) para el contrato HTTP.
+- **Frontend (flutter_test + mocktail):** widget/notifier tests de los estados que el spec exige
+  (CA-17 inválido, CA-19 expirada, CA-20 doble-submit) + mapeo DTO→`Money`.
+- Trazabilidad: anotar `// CA-N` en los tests para cerrar spec→test.
 
 ## Backlog / iteración futura (fuera del scope 2-3h)
 - **`contract-checker` agent (BE↔FE):** verificar que el contrato de la API (códigos de error,
