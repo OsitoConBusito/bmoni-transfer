@@ -4,6 +4,7 @@ import { Money } from "../domain/money.js";
 import type { Clock } from "../domain/ports/clock.js";
 import type { IdGenerator } from "../domain/ports/id-generator.js";
 import type { QuoteRepository } from "../domain/ports/quote-repository.js";
+import type { QuoteSigner } from "../domain/ports/quote-signer.js";
 import type { RateProvider } from "../domain/ports/rate-provider.js";
 import { Quote } from "../domain/quote.js";
 import { type AppError, ErrorCode, unavailableError, validationError } from "../shared/errors.js";
@@ -15,6 +16,7 @@ export interface GetQuoteDeps {
   readonly clock: Clock;
   readonly quotes: QuoteRepository;
   readonly ids: IdGenerator;
+  readonly signer: QuoteSigner;
   readonly minAmount: Money;
   readonly maxAmount: Money;
   readonly quoteTtlMs: number;
@@ -49,14 +51,17 @@ export class GetQuoteUseCase {
     }
 
     const createdAt = this.deps.clock.now();
-    const quote = Quote.create({
-      id: this.deps.ids.next(),
-      sourceAmount: amount.value,
-      rate: rate.value,
-      fee,
-      createdAt,
-      ttlMs: this.deps.quoteTtlMs,
-    });
+    const quote = Quote.create(
+      {
+        id: this.deps.ids.next(),
+        sourceAmount: amount.value,
+        rate: rate.value,
+        fee,
+        createdAt,
+        ttlMs: this.deps.quoteTtlMs,
+      },
+      this.deps.signer,
+    );
     this.deps.quotes.save(quote);
     return ok(quote);
   }

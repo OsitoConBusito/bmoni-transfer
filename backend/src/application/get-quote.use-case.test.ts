@@ -5,6 +5,7 @@ import { Money } from "../domain/money.js";
 import type { RateProvider, RateUnavailable } from "../domain/ports/rate-provider.js";
 import type { Rate } from "../domain/rate.js";
 import { FakeClock } from "../infrastructure/clock/fake-clock.js";
+import { HmacQuoteSigner } from "../infrastructure/crypto/hmac-quote-signer.js";
 import { SequentialIdGenerator } from "../infrastructure/id/sequential-id-generator.js";
 import { InMemoryQuoteRepository } from "../infrastructure/persistence/in-memory-quote-repository.js";
 import { StubRateProvider } from "../infrastructure/rate/stub-rate-provider.js";
@@ -21,6 +22,7 @@ const buildUseCase = (overrides: Partial<GetQuoteDeps> = {}) => {
     clock: new FakeClock(1_000),
     quotes,
     ids: new SequentialIdGenerator("quote"),
+    signer: new HmacQuoteSigner("test-secret"),
     minAmount: mxn("10"),
     maxAmount: mxn("100000"),
     quoteTtlMs: 60_000,
