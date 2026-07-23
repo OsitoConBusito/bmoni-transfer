@@ -9,6 +9,23 @@ Node/TS backend (`backend/`) + Flutter app (`app/`).
 
 ---
 
+## Screenshots
+
+| Amount entry | Confirmation | Result |
+|:---:|:---:|:---:|
+| ![Amount entry with a live quote](docs/screenshots/amount-entry.png) | ![Confirmation with the rate-hold countdown](docs/screenshots/confirmation.png) | ![Successful transfer result](docs/screenshots/result-success.png) |
+
+<details>
+<summary>Edge cases (loading, network error, invalid input, expired quote)</summary>
+
+| Expired quote |
+|:---:|
+| ![Confirmation showing an expired quote](docs/screenshots/confirmation-expired.png) |
+
+</details>
+
+---
+
 ## Requirements
 
 | Tool | Version used |

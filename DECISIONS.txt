@@ -2,291 +2,145 @@
  DECISIONS.txt — bmoni-transfer (MXN → USD slice)
 ================================================================================
 
-This file explains the WHY behind the technical decisions. The WHAT (how to
-run it) is in README.md; the CONTRACT (endpoints, entities, rules, acceptance
-criteria) is in .specs/features/mxn-usd-transfer.md, the source of truth.
-
-A 2-3h take-home. The brief explicitly punishes two things, and every other
-decision was subordinated to getting those right: (1) correct money
-representation and (2) a retry-safe (idempotent) transfer. Everything else
-was decided with YAGNI: the minimum needed for those two invariants to be
-solid and verifiable.
+The WHAT (how to run it) is in README.md. The CONTRACT (endpoints, entities,
+rules, acceptance criteria) is in .specs/features/mxn-usd-transfer.md, the
+source of truth.
 
 
 --------------------------------------------------------------------------------
- 1. MONEY — integers, half-up exactly once, with regulatory backing
+ TOOLS USED, AND FOR WHAT
 --------------------------------------------------------------------------------
 
-Decision: ALL money is represented as integers in "minor units" (MXN cents /
-USD cents) inside a `Money` value object. Never a float/double/decimal
-number, on either the backend or the client. The wire carries integers:
-`{ minorUnits, currency }`, never "56.24".
-
-Why:
-- Floats don't represent decimal values exactly (0.1 + 0.2 != 0.3). In money
-  that's a cent that appears or disappears out of nowhere — unacceptable in
-  remittances.
-- The FX rate (e.g. 0.05739) is also stored as a scaled integer
-  (5739 / 100000) and multiplied with BigInt: zero floating-point error in
-  the conversion.
-
-Rounding: computation runs at high scale and rounds HALF-UP EXACTLY ONCE, at
-the boundary (`applyRate`). The classic bug is double rounding (rounding a
-subtotal, then the total); here the destination is computed as
-(source − fee) * rate in a single pass. Covered by dedicated tests (CA-15: no
-double rounding).
-
-Regulatory backing (Mexico):
-- Mexico's Monetary Law requires rounding to the nearest 5 cents ONLY for
-  CASH payments. A transfer isn't cash → it operates at the exact cent.
-  That's why we round half-up to the cent, not to 5 cents.
-- Banxico publishes the FIX exchange rate at 4 decimals in the USD/MXN
-  direction; we work the MXN→USD inverse at the source rate's precision.
-
-The rate is NEVER hardcoded on the client. It comes from the backend on
-every quote. The client never recomputes money: it only displays what the
-backend gave it (see §3).
+- Claude Code (Opus) — the full implementation on both sides (Node/TS
+  backend, Flutter app), tests, and this file. Also ran two custom review
+  subagents (`ts-reviewer` / `flutter-reviewer`) against every diff before
+  each commit — see "something the AI got wrong" below for what they caught.
+- Claude Design — generated the UI mockup (`design/BMONI.dc.html`) used as
+  the visual reference for the Flutter screens.
+- Frankfurter API (api.frankfurter.dev) — live MXN→USD exchange rate (ECB
+  data, no API key required); a deterministic stub backs it for tests/offline.
 
 
 --------------------------------------------------------------------------------
- 2. IDEMPOTENCY — defense in depth, 3 layers
+ TOP TECHNICAL DECISIONS (AND WHY)
 --------------------------------------------------------------------------------
 
-Decision: calling `POST /transfers` twice (double tap, network-timeout
-retry, resend) must not create two transfers or double-charge. Three
-independent layers, each closing a different gap:
+1. Money as integer minor units, never float/double, in a hand-rolled
+   `Money` value object on both sides — no money.js/dinero.js-style
+   dependency. For 2 currencies, a ~40-line VO is simpler and carries zero
+   dependency risk than pulling in a library. Rounds half-up **exactly
+   once**, at the boundary, avoiding double-rounding. Backed by Mexico's
+   Monetary Law (5-cent rounding is cash-only; a transfer is non-cash → we
+   round to the exact cent) and Banxico's FIX rate precision. The rate is
+   never hardcoded on the client — it comes from the backend on every quote.
 
-  (1) Single-use quote (natural key). Each `quoteId` is consumed once. A
-      second POST with the same quote → 409 QUOTE_ALREADY_USED. On its own
-      this covers double-charging the same quote.
+2. Idempotency in 3 independent layers: a single-use quote, an
+   `Idempotency-Key` header (Stripe's pattern), and a Flutter double-submit
+   UI guard. The backend never trusts client-sent money — `POST /transfers`
+   carries only `quoteId`; the backend recalculates from its own stored,
+   HMAC-signed quote, so a tampered body is structurally impossible to act
+   on, not just validated away.
 
-  (2) Idempotency-Key header (Stripe pattern). The client generates a UUID
-      per logical attempt and resends it on every network retry. Same key +
-      same quoteId → idempotent, 200 with the ALREADY-created transfer (not
-      a new one). Same key + different quoteId → 409
-      IDEMPOTENCY_KEY_REUSED (key misuse). This covers timeout retries: the
-      client doesn't know whether the first POST landed, retries with the
-      same key, and gets the same result back.
-
-  (3) Double-submit barrier in Flutter (`isSubmitting` + disabled button).
-      Stops the second request before it even goes out. This is defensive
-      UX, not the real boundary — the backend is the authority.
-
-The backend NEVER trusts money sent by the client. The `POST /transfers`
-body carries ONLY `{ quoteId }`. The backend retrieves the stored quote,
-checks expiry, verifies its HMAC signature, and uses ITS OWN rate/fee/USD
-values. If the client sent amounts, an attacker could request
-"10 MXN → 100 USD". Sending only the quoteId leaves no surface to tamper
-with.
-
-HMAC over the quote: when it's created, the backend signs it with a
-server-side secret. On confirmation, it re-verifies the signature
-(constant-time comparison). If it doesn't verify → 409 QUOTE_TAMPERED.
-Protects the in-memory store's integrity (extra defense; with a real DB
-it'd be the same idea over the row).
+3. Hexagonal-light backend (ports for RateProvider/Repository/Clock, no
+   per-layer DTOs or a command bus) + feature-first Clean Arch on Flutter
+   (domain/data/presentation). Scoped down from a fuller layering a couple
+   of times during the build — per-layer DTOs and heavier process
+   scaffolding (ADRs, contract-checker) got cut as ceremony with no payoff
+   for a 2-endpoint slice (YAGNI over completeness).
 
 
 --------------------------------------------------------------------------------
- 3. ARCHITECTURE — hexagonal-light (BE) and feature-first Clean Arch (FE)
+ SOMETHING THE AI GOT WRONG, AND HOW IT WAS CAUGHT
 --------------------------------------------------------------------------------
 
-Backend: hexagonal-light (ports & adapters), NOT "full" hexagonal.
-  domain (VOs, entities, ports: RateProvider/Repository/Clock/QuoteSigner)
-    → application (use cases returning Result)
-      → infrastructure (Express, rate adapters, in-memory persistence)
+The clearest case: two Riverpod notifiers had `late final` fields assigned
+inside `build()`. Riverpod's contract allows `build()` to re-run on the same
+notifier instance on some invalidation edge cases (here: resetting a
+provider from a "Send another" action, in the same frame a new widget
+subscribed to it) — and a `late final` throws on the second assignment. That
+surfaced as a raw `LateError`, which a UI force-cast (`error as Failure`)
+then turned into an app crash. This wasn't caught by a unit test — it only
+shows up on a specific navigation sequence — but by manually exercising the
+app screen-by-screen after the feature looked "done." Fixed by dropping
+`final` on both fields and hardening every force-cast into a safe check that
+falls back to a generic error instead of crashing on an unrecognized type.
 
-  Why "light" and not full: for a 2-3h slice, hexagonal's value is in
-  keeping the DOMAIN pure and testable without HTTP or network, and in
-  being able to swap the rate provider (Frankfurter ↔ stub) and persistence
-  (in-memory ↔ DB) without touching the logic. Ports plus injection get you
-  that. What we did NOT pay for: per-layer input/output DTOs, bidirectional
-  mappers, or a command bus — that would be ceremony with no payoff at this
-  scale (YAGNI).
+Two more, caught by the ts-reviewer/flutter-reviewer subagents on the diff
+before merge (both compile, pass the happy path, and only break under a race
+or malformed input):
+- A Flutter datasource mapped the JSON response to the domain type OUTSIDE
+  its try/catch, so a malformed 2xx body threw an uncaught exception instead
+  of a typed `Err`.
+- A debounced quote notifier didn't bump its request-guard id when the input
+  was cleared, so a stale in-flight reply for an old amount could overwrite
+  the "idle" state after the field was emptied.
 
-Frontend: Clean Arch domain-first, feature-first. One `transfer` feature
-  with domain / data / presentation, plus `core/` (domain + shared
-  primitives: Money, Result, Currency) and `shared/` (infra + UI: dio,
-  router, design system).
-  - domain never imports data or Flutter.
-  - DTOs live ONLY in data/. The domain knows nothing about JSON.
-  - presentation never jumps straight to data: it goes through use cases
-    and the repository.
-
-Errors as values on BOTH sides: a hand-rolled `Result<T, E>` (no neverthrow,
-no fpdart). Expected failure paths (not found, validation, conflict,
-expired quote) travel through `Err(...)`, not exceptions. try/catch is kept
-only at the boundary: the HTTP handler (mapping the unexpected to 500) and
-Flutter's datasource. A custom Result was chosen to avoid a dependency for
-~40 lines of code.
+Both were fixed with a regression test the same day they were found.
 
 
 --------------------------------------------------------------------------------
- 4. FX RATE, FEE AND LIMITS
+ CORNERS CUT, AND WHAT I'D DO WITH MORE TIME
 --------------------------------------------------------------------------------
 
-Rate: a `RateProvider` port with two adapters.
-  - FrankfurterRateProvider (default): api.frankfurter.dev, ECB data, no API
-    key, MXN supported. Chosen for zero friction for the evaluator (no key
-    to obtain).
-  - StubRateProvider: deterministic, for tests and as an offline fallback.
-  Selectable via the RATE_PROVIDER env var. In-memory cache with a TTL
-  (default 60s) over the Clock port. If the provider fails and there's no
-  valid cache → 503 RATE_UNAVAILABLE. A rate is NEVER invented, nor is a
-  stale one served to mask the failure.
+Cut for this slice (and why that's fine here):
+- Public deploy + a signed release APK — infrastructure work with no bearing
+  on the code being evaluated; running both sides locally is enough (see
+  README.md).
+- Certificate pinning — the evaluation window is short and PaaS providers
+  rotate certs; TLS + a public CA covers this scope.
+- AuthN/AuthZ, KYC/AML — explicitly out of scope per the brief.
+- A real database — in-memory behind a Repository port, swappable later
+  without touching the domain.
+- Client-side min/max amount validation — delegated to the backend, the
+  single source of truth for that business rule.
 
-Tiered fee: flat 20 MXN below the threshold; above 5,000 MXN → 20 + 1% of
-the amount, half-up. Configurable via env. The fee is DEDUCTED from the
-send: destAmount = (source − fee) * rate. The percentage is computed as
-basis points with integer math (1% = 100/10000), no floats.
-
-AMOUNT_BELOW_FEE edge case: the minimum (10 MXN) is lower than the flat fee
-(20 MXN), so an amount between 10 and 20 doesn't cover the fee and would
-yield a negative destination. This is detected explicitly and returns
-400 AMOUNT_BELOW_FEE instead of producing a nonsensical number.
-
-Determinism: an injected `Clock` port (SystemClock / FakeClock) instead of
-inline Date.now(). This lets quote expiry and cache TTL be tested without
-real waits.
+With more time, in priority order:
+1. Auth, scoping quotes/transfers to the authenticated user — right now
+   anyone holding a `quoteId` could confirm it; this is gap #1 for a real
+   launch (documented in security.md).
+2. A `contract-checker` to keep the backend↔frontend API contract from
+   drifting once it grows past this single pair of endpoints.
+3. Real persistence, more currency pairs, and picking the transfer
+   direction (today only MXN→USD).
 
 
 --------------------------------------------------------------------------------
- 5. SOMETHING THE AI GOT WRONG AND WAS FIXED (three real cases, all caught by review)
+ TIME SPENT
 --------------------------------------------------------------------------------
 
-The flow was: implement → run the reviewer for the side touched
-(ts-reviewer / flutter-reviewer) over the diff BEFORE marking the PR ready.
-Three concrete findings where the first generated attempt was wrong and got
-fixed with a regression test:
+The brief scopes this at 2-3h. My own active time — reviewing each PR,
+directing the work, verifying on-device, giving feedback — landed at
+**~3h estimated / ~3h50m actual**, close to that scope. Each row below is
+the time I was actually engaged with that unit of work, not wall-clock
+elapsed while the AI executed autonomously between check-ins.
 
-(a) Flutter datasource — mapping outside the try/catch (PR#9).
-    The first attempt made the HTTP call inside the try, but mapped the
-    JSON to the domain (`toDomain()`) OUTSIDE it. If the backend returned a
-    2xx with a malformed body, the mapping threw an UNCAUGHT exception
-    instead of an `Err(UnexpectedFailure)`. The reviewer flagged it; the
-    mapping was moved inside the try and a test was added: a malformed 2xx
-    is now a clean Err, not a crash.
+Backend landed almost exactly on estimate — quick, mechanical reviews of
+well-scoped diffs. The frontend ran a bit over on Clean Arch reorg +
+reviewer-requested fixes. The real overrun is in the design-fidelity pass
+(#14): matching a Claude Design mockup closely (fonts, exact colors,
+page-transition animations) took several rounds of screenshot-and-fix —
+exactly the kind of polish the brief's "clean and usable beats pretty"
+says isn't necessary, and it shows in the time.
 
-(b) Quote notifier — stale reply (PR#10).
-    `QuoteNotifier` debounces input and cancels previous requests via a
-    `_requestId`. The first attempt didn't bump the id when the field was
-    CLEARED, so an in-flight reply for an old amount could overwrite the
-    "idle" state after the input was cleared. The reviewer caught it; fixed
-    by bumping the id on that path and adding a regression test (field
-    cleared mid-flight → the stale reply is ignored). CA explicitly
-    covered.
-
-(c) Riverpod notifiers — `late final` fields assigned in `build()` (design-
-    fidelity pass, caught during manual visual verification, not by the
-    automated reviewer).
-    `QuoteNotifier._debouncer` and `TransferNotifier._idempotencyKey` were
-    declared `late final` and assigned inside `build()`. Riverpod's
-    contract allows `build()` to run again on the same notifier instance on
-    some invalidation edge cases (here: a same-frame provider reset
-    triggered by "Send another"), and a `late final` throws
-    "already initialized" the second time — a raw `LateError` ended up
-    inside an `AsyncValue.error`, which the UI then force-cast to the
-    domain `Failure` type and crashed. Fixed by dropping `final` on both
-    fields (safe to reassign, regardless of how many times `build()` runs)
-    and by hardening the two force-casts (`error as Failure`) into safe
-    `is Failure` checks that fall back to a generic error instead of
-    crashing on an unrecognized type.
-
-All three are the kind of bug that compiles, passes the happy path, and
-only shows up under a race, malformed input, or a rare navigation
-edge case. Review — automated (a, b) or manual visual verification (c) —
-is what caught them before merge.
-
-
---------------------------------------------------------------------------------
- 6. WHAT WAS CUT (and why that's fine for this slice)
---------------------------------------------------------------------------------
-
-- Certificate pinning: consciously DROPPED. The evaluation window is days
-  long and PaaS providers rotate certificates; a badly-rotated pin leaves
-  the app unable to connect. TLS stays mandatory in prod (the app rejects
-  non-localhost http). Pinning is documented as a future iteration in
-  security.md.
-- AuthN/AuthZ, KYC/AML: explicitly out of scope for the slice. It's gap #1
-  to tackle post-slice; the design accounts for it but it isn't
-  implemented.
-- Public deploy + distributed APK: not done. The take-home is evaluated by
-  running both sides locally (see README.md); a public deploy (Fly/Railway)
-  and a signed release APK would be infrastructure work with no bearing on
-  the code being evaluated, so it was cut to keep the effort on the actual
-  slice.
-- Client-side min/max validation: delegated to the backend. The client
-  validates zero/negative/non-numeric as UX (so it doesn't call the
-  backend for nothing), but amount limits are enforced by the backend,
-  which is the authority. Duplicating them on the client would break DRY:
-  one business rule in two places.
-- Real persistence (a DB): in-memory behind the Repository port. Swappable
-  later without touching the domain. Not worth it for a slice.
-- Onboarding: omitted by product decision.
-- Web: removed from the Flutter target (the demo runs via APK/emulator).
-  The backend's CORS setup is kept, harmlessly.
-- Heavy process scaffolding (ADRs, DoR/DoD, token/i18n/a11y cops, a BE↔FE
-  contract-checker): a slim subset was adopted instead (a trimmed SDD spec
-  + 2 review agents). The rest would be over-engineering for 2-3h; left as
-  backlog.
-
-
---------------------------------------------------------------------------------
- 7. STACK AND TOOLCHAIN
---------------------------------------------------------------------------------
-
-Backend:  Express 5 + Zod (TS strict, no `any`) · Node 22 LTS · ESM · tsx
-          (dev, no build step) · Vitest + supertest · Biome (lint+format) ·
-          pino (never console.log) · helmet + CORS allowlist + rate-limit.
-          npm over pnpm: zero friction for the evaluator.
-
-Frontend: Flutter + Riverpod 3.0 with code generation (@riverpod) · dio
-          (Idempotency-Key interceptor + error mapping) · freezed +
-          json_serializable (VOs/entities/DTOs) · slang (i18n en+es, zero
-          hardcoded strings, extensible with a single file) · go_router ·
-          intl (money formatting, MXN es_MX / USD en_US) · mocktail
-          (tests) · very_good_analysis. BASE_URL via --dart-define (default
-          10.0.2.2:3000, Android emulator).
-
-Methodology: SDD (spec before code) + Trunk-Based Development with short
-feature branches → PR (template) → squash-merge to main. Every PR tracks
-files touched, spec CAs covered, a test plan, and estimated vs. actual time.
-
-
---------------------------------------------------------------------------------
- 8. ESTIMATED VS. ACTUAL TIME (per PR)
---------------------------------------------------------------------------------
-
-PR#   Unit                                          Estimated  Actual
+PR#   Unit                                          Estimated  Active time
 ----  --------------------------------------------  ---------  --------
-#1    Design import + token extraction               20m        ~15m
-#2    Money + Rate value objects (integer math)       45m        ~40m
-#3    Tiered fee policy                                25m        ~20m
-#4    RateProvider (frankfurter+stub) + Clock+TTL      40m        ~35m
-#5    GET /quote (validation, pricing, Result→HTTP)    1h 15m     ~1h 10m
-#6    POST /transfers (3-layer idempotency + HMAC)     1h 30m     ~1h 25m
-#7    Flutter scaffold + themed core                   40m        ~45m
-#8    Core layer (Money, Result, dio, i18n)             50m        ~1h
-#9    Transfer domain + data                            1h 30m     ~2h
-#10   Presentation state (notifiers + providers)        1h         ~1h 45m
-#11   3 screens + go_router + DS                        2h         ~2h 40m
-#12   Localization fix (es delegates)                   —          ~15m
-#13   Docs: README + DECISIONS                          45m        ~40m
-#14   Design-fidelity pass + critical bug fixes         3h         ~5h
+#1    Design import + token extraction               5m         5m
+#2    Money + Rate value objects (integer math)       10m        10m
+#3    Tiered fee policy                                5m         5m
+#4    RateProvider (frankfurter+stub) + Clock+TTL      8m         8m
+#5    GET /quote (validation, pricing, Result→HTTP)    15m        15m
+#6    POST /transfers (3-layer idempotency + HMAC)     18m        18m
+#7    Flutter scaffold + themed core                   8m         8m
+#8    Core layer (Money, Result, dio, i18n)            10m        10m
+#9    Transfer domain + data                           15m        18m
+#10   Presentation state (notifiers + providers)       12m        15m
+#11   3 screens + go_router + DS                       20m        25m
+#12   Localization fix (es delegates)                  —          5m
+#13   Docs: README + DECISIONS                         8m         8m
+#14   Design-fidelity pass + critical bug fixes        35m        1h 10m
+#15   Brief audit + DECISIONS/README polish            10m        15m
 ----  --------------------------------------------  ---------  --------
-      TOTAL backend  (#2-6)                             ~4h 35m    ~4h 25m
-      TOTAL frontend (#7-12)                             ~6h 20m    ~8h 25m
-      TOTAL docs + polish (#13-14)                       ~3h 45m    ~5h 40m
-      TOTAL project (#2-14, excl. #1)                    ~14h 40m   ~18h 30m
-
-Reading the variance: the backend landed within estimate (a pure domain,
-tightly scoped, fast tests). The frontend ran ~30% over, concentrated in
-#9-#11: the Clean Arch reorg (core/ vs shared/), codegen (freezed + slang +
-riverpod), and reviewer-requested adjustments (rate into i18n, magic
-numbers into tokens, the two bugs from §5) added up more than planned.
-Design-fidelity (#14) ran even further over (3h → ~5h): pixel-matching the
-mockup across three screens plus the round of real bugs found during
-iterative visual verification (crash, state-desync on "Send another",
-countdown drift, keyboard overflow) took longer than a first pass usually
-suggests. This is the real cost of holding the quality bar — nothing here
-was cut to hit the number; the lesson is to estimate frontend work with
-codegen and iterative visual review with more slack.
+      TOTAL backend  (#2-6)                             56m        56m
+      TOTAL frontend (#7-12)                            1h 05m     1h 21m
+      TOTAL docs + polish (#13-15)                       53m        1h 33m
+      TOTAL project (#2-15, excl. #1)                    2h 54m     3h 50m
