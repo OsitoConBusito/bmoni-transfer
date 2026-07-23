@@ -26,9 +26,13 @@ Aplican a **ambos** lados; el detalle vive en el spec.
    single-use + `Idempotency-Key` header + barrera de doble-submit en Flutter. El BE nunca
    confía en dinero del cliente: recupera la quote y recalcula.
 
-## Gitflow — TBD
-Trunk-Based sobre `main`. Commits pequeños y atómicos, Conventional Commits
-(`feat(be):`, `feat(app):`, `chore:`, `docs:`, `test:`). Ramas de vida muy corta solo si hace falta.
+## Gitflow — Trunk-Based con feature branches vía PR
+`main` es el trunk (siempre verde). Cada unidad de trabajo va en una **feature branch de vida corta**
+y entra por **Pull Request** contra `main`, usando el template `.github/pull_request_template.md`.
+- Nombres de rama: `feat/<slug>`, `fix/<slug>`, `chore/<slug>`, `docs/<slug>`.
+- Commits pequeños y atómicos, Conventional Commits (`feat(be):`, `feat(app):`, `chore:`, `docs:`, `test:`).
+- El PR documenta qué/por qué, archivos, CAs del spec cubiertos, test plan y **tiempo estimado vs real**
+  (para el tracking que pide la evaluación). Correr el reviewer del lado tocado antes de marcar ready.
 
 ## Review
 Antes de commitear una unidad de trabajo, correr el reviewer del lado tocado sobre el diff:

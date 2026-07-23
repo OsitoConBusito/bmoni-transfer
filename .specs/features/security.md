@@ -21,8 +21,10 @@ confidencialidad en tránsito, y que el BE no filtre internals.
 ## Plano 1 — En tránsito (app ↔ BE)
 - **TLS obligatorio en prod:** el cliente solo habla HTTPS contra el host de prod; rechaza `http`
   no-localhost. **HSTS** en el BE. En **dev** se permite `http://localhost` (sin TLS local, normal).
-- **Certificate pinning (móvil):** `dio` con `SecurityContext`/fingerprint del cert de prod →
-  mitiga MITM aun con una CA comprometida. Se salta en `localhost` (dev). Documentar cómo rotar el pin.
+- **Certificate pinning — DIFERIDO (no implementado).** Decisión consciente: la ventana de
+  evaluación es corta (<1 semana) y el host de prod (PaaS) rota su cert Let's Encrypt cada ~60-90
+  días, lo que volvería frágil un APK distribuido con pin al cert hoja. TLS + CA pública cubren MITM
+  para este scope. Ruta futura: pinning al SPKI del intermedio con backup pin, saltado en localhost.
 - **Sin datos sensibles en la URL** más allá del `amount` (no-sensible). Nada de secretos en query/logs.
 
 ## Plano 2 — Integridad del monto (no editable) — § crítica
@@ -47,10 +49,20 @@ confidencialidad en tránsito, y que el BE no filtre internals.
 ## Plano 4 — App hardening
 - **Sin secretos en el cliente:** el `hmacSecret` vive solo en el BE. La app no guarda datos sensibles
   en reposo (no hay auth/tokens en este slice).
-- **Build ofuscado** para release (`flutter build --obfuscate --split-debug-info`).
+- **Ofuscación de Dart:** `flutter build apk --release --obfuscate --split-debug-info=build/symbols`
+  → nombres de símbolos ofuscados; los símbolos de debug se guardan aparte (no en el APK).
+- **Minificación + shrinking (Android R8/ProGuard):** en `android/app/build.gradle` release →
+  `isMinifyEnabled = true` + `isShrinkResources = true`. Reglas ProGuard (`proguard-rules.pro`) con
+  los `-keep` que Flutter/plugins requieren (evitar romper reflection de dio/flutter). Reduce tamaño
+  y dificulta el reversing.
+- **Manifest release endurecido:** `android:allowBackup="false"` (no exfiltrar estado por backup),
+  `android:debuggable="false"`, y **network security config** que prohíbe cleartext salvo `localhost`
+  (coherente con TLS-obligatorio-en-prod). Sin `usesCleartextTraffic` global.
+- **Sin logging de datos sensibles** en la app; el logger de dev se desactiva/limita en release.
 - **Validación client-side = UX, no frontera de seguridad:** el BE revalida todo. La barrera de
   doble-submit es UX + defensa; la autoridad de no-duplicación es el BE (idempotencia).
-- **Sin logging de datos sensibles** en la app.
+- **(Opcional, si sobra tiempo):** `FLAG_SECURE` en pantallas con montos para bloquear screenshots
+  en el recientes; detección básica de root/emulador queda fuera de scope.
 
 ---
 
@@ -64,6 +76,7 @@ confidencialidad en tránsito, y que el BE no filtre internals.
 - **CA-S1:** Un `POST /transfers` con montos manipulados en el body produce un transfer con los
   valores de la quote guardada (no los del body).
 - **CA-S2:** Una quote con firma HMAC inválida/alterada → `409`/`400` de integridad, no se crea transfer.
-- **CA-S3:** El cliente rechaza una URL `http` no-localhost en prod (TLS obligatorio).
+- **CA-S3:** El cliente rechaza una URL `http` no-localhost en prod (TLS obligatorio). (Cert pinning
+  diferido — ver Plano 1.)
 - **CA-S4:** Un 500 nunca devuelve stack trace ni internals; responde el envelope curado y loguea aparte.
 - **CA-S5:** CORS en prod solo permite orígenes del allowlist; el rate-limit responde `429` al exceder.
