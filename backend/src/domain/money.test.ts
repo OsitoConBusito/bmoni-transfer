@@ -81,6 +81,19 @@ describe("Money.applyRate", () => {
   });
 });
 
+describe("Money.fraction", () => {
+  it("given basis points, when fraction, then scales half-up in the same currency", () => {
+    const amount = Money.fromMajor("10000", Currency.MXN);
+    expect(amount.fraction(100, 10000).toMajor()).toBe(100); // 1% of 10000 = 100.00
+  });
+
+  it("given a non-integer or non-positive denominator, when fraction, then throws", () => {
+    const amount = Money.fromMajor("100", Currency.MXN);
+    expect(() => amount.fraction(1, 0)).toThrow(MoneyError);
+    expect(() => amount.fraction(1.5, 100)).toThrow(MoneyError);
+  });
+});
+
 describe("Money.toMajor", () => {
   it("given minor units, when toMajor, then returns the decimal major value", () => {
     expect(Money.ofMinor(5624, Currency.USD).toMajor()).toBe(56.24);
