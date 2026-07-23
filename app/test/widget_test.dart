@@ -16,6 +16,6 @@ void main() {
     );
 
     expect(find.text('Send money'), findsOneWidget);
-    expect(find.text('You send (MXN)'), findsOneWidget);
+    expect(find.text('YOU SEND · MXN'), findsOneWidget);
   });
 }

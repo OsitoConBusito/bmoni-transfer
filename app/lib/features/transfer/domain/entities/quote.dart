@@ -17,6 +17,9 @@ abstract class Quote with _$Quote {
     required DateTime expiresAt,
   }) = _Quote;
 
+  /// What actually gets converted to USD: the send minus the deducted fee.
+  Money get convertedAmount => sourceAmount.minus(fee);
+
   bool isExpiredAt(DateTime now) => !now.isBefore(expiresAt);
 
   Duration remainingAt(DateTime now) {
