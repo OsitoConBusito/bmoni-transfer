@@ -41,6 +41,13 @@ describe("Money arithmetic", () => {
     const usd = Money.fromMajor("10", Currency.USD);
     expect(() => mxn.plus(usd)).toThrow(MoneyError);
   });
+
+  it("given two amounts, when isGreaterThan, then compares minor units", () => {
+    const amount = Money.fromMajor("5000.01", Currency.MXN);
+    const threshold = Money.fromMajor("5000", Currency.MXN);
+    expect(amount.isGreaterThan(threshold)).toBe(true);
+    expect(threshold.isGreaterThan(amount)).toBe(false);
+  });
 });
 
 describe("Money.applyRate", () => {

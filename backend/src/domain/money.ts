@@ -41,7 +41,7 @@ export class Money {
     }
     const scale = minorUnitScale(currency);
     const minor = Number(intPart) * scale + Number(fracPart.padEnd(exponent, "0") || "0");
-    return new Money(negative ? -minor : minor, currency);
+    return Money.ofMinor(negative ? -minor : minor, currency);
   }
 
   /** Major-unit numeric view — for display/formatting only, never for further money math. */
@@ -73,15 +73,15 @@ export class Money {
     if (this.minorUnits < 0) {
       throw new MoneyError("applyRate is only defined for non-negative amounts");
     }
-    const exponentDelta = CURRENCY_EXPONENT[target] - CURRENCY_EXPONENT[this.currency];
-    const source = BigInt(this.minorUnits);
-    const product =
-      exponentDelta >= 0
-        ? source * rate.scaledValue * 10n ** BigInt(exponentDelta)
-        : source * rate.scaledValue;
-    const divisor = exponentDelta >= 0 ? rate.scale : rate.scale * 10n ** BigInt(-exponentDelta);
-    const targetMinor = halfUpDivide(product, divisor);
-    return new Money(Number(targetMinor), target);
+    if (CURRENCY_EXPONENT[target] !== CURRENCY_EXPONENT[this.currency]) {
+      throw new MoneyError(
+        `applyRate requires equal minor-unit exponents (${this.currency}->${target})`,
+      );
+    }
+    // Equal exponents, so targetMinor = round_half_up(sourceMinor * rate), exact via BigInt.
+    const product = BigInt(this.minorUnits) * rate.scaledValue;
+    const targetMinor = halfUpDivide(product, rate.scale);
+    return Money.ofMinor(Number(targetMinor), target);
   }
 
   private assertSameCurrency(other: Money): void {
