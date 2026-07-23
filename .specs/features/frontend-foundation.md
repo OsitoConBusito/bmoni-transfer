@@ -55,9 +55,19 @@ Set mínimo reutilizable, todos widgets-como-clase:
 
 ---
 
+## Branding BMONI (assets reales)
+
+Assets oficiales en `app/assets/brand/` (descargados de bmoni.com): `bmoni-logo.webp`,
+`bmoni-logo-white.webp` (para fondos oscuros), `bmoni-favicon.png` (1032², base del ícono de app).
+**Paleta de marca** (extraída del sitio) — familia púrpura/magenta:
+- `brandMagenta #C94CD7` (seed principal) · `brandDeep #370E36` (base oscura) ·
+  `brandLavender #D8B4D7` · `brandPink #FDA9FF` · `brandStrong #B001B0`.
+Uso como homenaje/prototipo para el take-home (entregable a la propia BMONI), no producción.
+
 ## Theming (`core/theme/`)
 
-- `ThemeData` claro y oscuro desde **`ColorScheme.fromSeed`** (un seed de marca) — M3.
+- `ThemeData` claro y oscuro desde **`ColorScheme.fromSeed(seedColor: brandMagenta)`** — M3.
+  (Si Claude Design entrega tokens afinados, reemplazan estos valores.)
 - **`AppColors` (ThemeExtension)** con los colores semánticos que M3 no cubre:
   `positive` (recibe USD), `negative`/`fee`, `warning` (quote por expirar). Se resuelven por brillo
   del tema; los widgets leen `Theme.of(context).extension<AppColors>()`, nunca hex.
