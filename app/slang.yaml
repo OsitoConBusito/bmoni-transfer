@@ -6,3 +6,4 @@ output_file_name: strings.g.dart
 translate_var: t
 locale_handling: true
 flutter_integration: true
+string_interpolation: braces

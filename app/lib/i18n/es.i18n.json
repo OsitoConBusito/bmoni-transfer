@@ -1,4 +1,46 @@
 {
   "appName": "BMONI",
-  "tagline": "Envía dinero de México a Estados Unidos"
+  "tagline": "Envía dinero de México a Estados Unidos",
+  "amountEntry": {
+    "title": "Enviar dinero",
+    "amountLabel": "Envías (MXN)",
+    "amountHint": "0.00",
+    "youReceive": "El destinatario recibe",
+    "rate": "Tipo de cambio",
+    "fee": "Comisión",
+    "continueCta": "Continuar"
+  },
+  "confirmation": {
+    "title": "Confirmar transferencia",
+    "youSend": "Envías",
+    "fee": "Comisión",
+    "rate": "Tipo de cambio",
+    "youReceive": "El destinatario recibe",
+    "expiresIn": "La cotización expira en {seconds}s",
+    "expiredTitle": "Esta cotización expiró",
+    "backToQuote": "Volver a cotizar",
+    "confirmCta": "Confirmar y enviar"
+  },
+  "result": {
+    "successTitle": "Transferencia completada",
+    "successBody": "{amount} va en camino.",
+    "failureTitle": "La transferencia falló",
+    "retryCta": "Reintentar",
+    "doneCta": "Listo"
+  },
+  "errors": {
+    "network": "Sin conexión. Revisa tu internet e intenta de nuevo.",
+    "rateUnavailable": "El tipo de cambio no está disponible por ahora.",
+    "amountNotNumeric": "Ingresa un monto válido.",
+    "amountNotPositive": "Ingresa un monto mayor a cero.",
+    "amountTooLow": "El monto es menor al mínimo.",
+    "amountTooHigh": "El monto supera el máximo.",
+    "amountBelowFee": "El monto debe ser mayor a la comisión.",
+    "quoteExpired": "Esta cotización expiró. Solicita una nueva.",
+    "unexpected": "Algo salió mal. Intenta de nuevo."
+  },
+  "common": {
+    "retry": "Reintentar",
+    "rateValue": "1 MXN ≈ {rate} USD"
+  }
 }
