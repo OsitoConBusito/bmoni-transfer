@@ -54,6 +54,10 @@
     "quoteExpired": "Esta cotización expiró. Solicita una nueva.",
     "unexpected": "Algo salió mal. Intenta de nuevo."
   },
+  "feeInfo": {
+    "fixedOnly": "Tarifa fija de {fixed}.",
+    "combined": "{fixed} fija + {percent}% ({variable}) por superar {threshold}."
+  },
   "common": {
     "retry": "Reintentar",
     "rateValue": "1 MXN ≈ {rate} USD"

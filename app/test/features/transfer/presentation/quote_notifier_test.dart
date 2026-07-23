@@ -4,6 +4,7 @@ import 'package:bmoni_transfer/core/error/failure.dart';
 import 'package:bmoni_transfer/core/money/currency.dart';
 import 'package:bmoni_transfer/core/money/money.dart';
 import 'package:bmoni_transfer/core/result/result.dart';
+import 'package:bmoni_transfer/features/transfer/domain/entities/fee_breakdown.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/quote.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/rate.dart';
 import 'package:bmoni_transfer/features/transfer/domain/transfer_repository.dart';
@@ -19,6 +20,12 @@ final _quote = Quote(
   id: 'q1',
   sourceAmount: const Money(minorUnits: 100000, currency: Currency.mxn),
   fee: const Money(minorUnits: 2000, currency: Currency.mxn),
+  feeBreakdown: const FeeBreakdown(
+    fixed: Money(minorUnits: 2000, currency: Currency.mxn),
+    variable: Money(minorUnits: 0, currency: Currency.mxn),
+    threshold: Money(minorUnits: 500000, currency: Currency.mxn),
+    percentBasisPoints: 100,
+  ),
   destAmount: const Money(minorUnits: 5624, currency: Currency.usd),
   rate: const Rate(value: '0.05739', source: 'stub', asOf: '2026-07-22'),
   expiresAt: DateTime.utc(2026, 7, 22, 19, 1),

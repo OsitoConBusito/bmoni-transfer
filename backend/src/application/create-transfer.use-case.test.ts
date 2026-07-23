@@ -22,6 +22,12 @@ const buildQuote = (id: string, signer: QuoteSigner): Quote =>
       sourceAmount: mxn("1000"),
       rate: Rate.of("0.05739", "stub", "2026-07-22"),
       fee: mxn("20"),
+      feeBreakdown: {
+        fixed: mxn("20"),
+        variable: mxn("0"),
+        threshold: mxn("5000"),
+        percentBasisPoints: 100,
+      },
       createdAt: CREATED_AT,
       ttlMs: TTL,
     },

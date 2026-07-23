@@ -43,6 +43,7 @@ class TranslationsEs with BaseTranslations<AppLocale, Translations> implements T
 	@override late final _Translations$confirmation$es confirmation = _Translations$confirmation$es._(_root);
 	@override late final _Translations$result$es result = _Translations$result$es._(_root);
 	@override late final _Translations$errors$es errors = _Translations$errors$es._(_root);
+	@override late final _Translations$feeInfo$es feeInfo = _Translations$feeInfo$es._(_root);
 	@override late final _Translations$common$es common = _Translations$common$es._(_root);
 }
 
@@ -127,6 +128,17 @@ class _Translations$errors$es implements Translations$errors$en {
 	@override String get unexpected => 'Algo salió mal. Intenta de nuevo.';
 }
 
+// Path: feeInfo
+class _Translations$feeInfo$es implements Translations$feeInfo$en {
+	_Translations$feeInfo$es._(this._root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String fixedOnly({required Object fixed}) => 'Tarifa fija de ${fixed}.';
+	@override String combined({required Object fixed, required Object percent, required Object variable, required Object threshold}) => '${fixed} fija + ${percent}% (${variable}) por superar ${threshold}.';
+}
+
 // Path: common
 class _Translations$common$es implements Translations$common$en {
 	_Translations$common$es._(this._root);
@@ -193,6 +205,8 @@ extension on TranslationsEs {
 			'errors.amountBelowFee' => 'El monto debe ser mayor a la comisión.',
 			'errors.quoteExpired' => 'Esta cotización expiró. Solicita una nueva.',
 			'errors.unexpected' => 'Algo salió mal. Intenta de nuevo.',
+			'feeInfo.fixedOnly' => ({required Object fixed}) => 'Tarifa fija de ${fixed}.',
+			'feeInfo.combined' => ({required Object fixed, required Object percent, required Object variable, required Object threshold}) => '${fixed} fija + ${percent}% (${variable}) por superar ${threshold}.',
 			'common.retry' => 'Reintentar',
 			'common.rateValue' => ({required Object rate}) => '1 MXN ≈ ${rate} USD',
 			_ => null,

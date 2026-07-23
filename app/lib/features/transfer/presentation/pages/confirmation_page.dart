@@ -4,6 +4,7 @@ import 'package:bmoni_transfer/core/money/money.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/quote.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/transfer.dart';
 import 'package:bmoni_transfer/features/transfer/presentation/notifiers/transfer_notifier.dart';
+import 'package:bmoni_transfer/features/transfer/presentation/widgets/fee_explanation.dart';
 import 'package:bmoni_transfer/i18n/strings.g.dart';
 import 'package:bmoni_transfer/shared/design_system/tokens/app_radii.dart';
 import 'package:bmoni_transfer/shared/design_system/tokens/app_sizing.dart';
@@ -151,6 +152,11 @@ class _Breakdown extends StatelessWidget {
           _Line(
             label: translations.confirmation.fee,
             value: AppMoneyText(quote.fee, color: colors?.fee, negative: true),
+          ),
+          const Gap(AppSpacing.xs),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FeeExplanation(breakdown: quote.feeBreakdown),
           ),
           const Gap(AppSpacing.sm),
           _Line(

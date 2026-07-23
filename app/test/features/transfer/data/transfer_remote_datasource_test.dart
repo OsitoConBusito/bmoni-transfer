@@ -14,6 +14,12 @@ Map<String, dynamic> _quoteBody({String destCurrency = 'USD'}) => {
   'quoteId': 'q1',
   'sourceAmount': {'minorUnits': 100000, 'currency': 'MXN'},
   'fee': {'minorUnits': 2000, 'currency': 'MXN'},
+  'feeBreakdown': {
+    'fixed': {'minorUnits': 2000, 'currency': 'MXN'},
+    'variable': {'minorUnits': 0, 'currency': 'MXN'},
+    'threshold': {'minorUnits': 500000, 'currency': 'MXN'},
+    'percentBasisPoints': 100,
+  },
   'destAmount': {'minorUnits': 5624, 'currency': destCurrency},
   'rate': {'value': '0.05739', 'source': 'stub', 'asOf': '2026-07-22'},
   'expiresAt': '2026-07-22T19:01:00.000Z',

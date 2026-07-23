@@ -51,6 +51,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$confirmation$en confirmation = Translations$confirmation$en._(_root);
 	late final Translations$result$en result = Translations$result$en._(_root);
 	late final Translations$errors$en errors = Translations$errors$en._(_root);
+	late final Translations$feeInfo$en feeInfo = Translations$feeInfo$en._(_root);
 	late final Translations$common$en common = Translations$common$en._(_root);
 }
 
@@ -225,6 +226,21 @@ class Translations$errors$en {
 	String get unexpected => 'Something went wrong. Please try again.';
 }
 
+// Path: feeInfo
+class Translations$feeInfo$en {
+	Translations$feeInfo$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Flat fee of {fixed}.'
+	String fixedOnly({required Object fixed}) => 'Flat fee of ${fixed}.';
+
+	/// en: '{fixed} flat + {percent}% ({variable}) for amounts over {threshold}.'
+	String combined({required Object fixed, required Object percent, required Object variable, required Object threshold}) => '${fixed} flat + ${percent}% (${variable}) for amounts over ${threshold}.';
+}
+
 // Path: common
 class Translations$common$en {
 	Translations$common$en._(this._root);
@@ -295,6 +311,8 @@ extension on Translations {
 			'errors.amountBelowFee' => 'Amount must be greater than the fee.',
 			'errors.quoteExpired' => 'This quote expired. Please request a new one.',
 			'errors.unexpected' => 'Something went wrong. Please try again.',
+			'feeInfo.fixedOnly' => ({required Object fixed}) => 'Flat fee of ${fixed}.',
+			'feeInfo.combined' => ({required Object fixed, required Object percent, required Object variable, required Object threshold}) => '${fixed} flat + ${percent}% (${variable}) for amounts over ${threshold}.',
 			'common.retry' => 'Retry',
 			'common.rateValue' => ({required Object rate}) => '1 MXN ≈ ${rate} USD',
 			_ => null,

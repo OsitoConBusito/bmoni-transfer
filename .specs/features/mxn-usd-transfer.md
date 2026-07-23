@@ -211,11 +211,22 @@ CORS habilitado (permite correr el Flutter en web). Logger estructurado **pino**
   "quoteId": "uuid",
   "sourceAmount": { "minorUnits": 100050, "currency": "MXN" },
   "fee":          { "minorUnits": 2000,   "currency": "MXN" },
+  "feeBreakdown": {
+    "fixed":    { "minorUnits": 2000,   "currency": "MXN" },
+    "variable": { "minorUnits": 0,      "currency": "MXN" },
+    "threshold":{ "minorUnits": 500000, "currency": "MXN" },
+    "percentBasisPoints": 100
+  },
   "destAmount":   { "minorUnits": 5624,   "currency": "USD" },
   "rate": { "value": "0.05739", "source": "frankfurter", "asOf": "2026-07-22" },
   "expiresAt": "2026-07-22T19:00:60Z"
 }
 ```
+`feeBreakdown` explica cómo se compuso la comisión, para que el cliente lo muestre **sin hardcodear
+la política**: `fixed` (parte plana) + `variable` (parte porcentual, `0` bajo el umbral), más la regla
+(`threshold`, `percentBasisPoints`). El `fee` total = `fixed + variable`. El % se aplica al monto
+completo sobre el umbral (ver § Fee escalonado). El cliente no recalcula: solo presenta estos valores.
+
 **Errores:** `400` (`AMOUNT_REQUIRED`, `AMOUNT_NOT_NUMERIC`, `AMOUNT_TOO_LOW`, `AMOUNT_TOO_HIGH`,
 `AMOUNT_NOT_POSITIVE`, `AMOUNT_BELOW_FEE`), `503 RATE_UNAVAILABLE`.
 `AMOUNT_BELOW_FEE`: el monto no cubre el fee (`sourceAmount ≤ fee`) — posible porque el mínimo

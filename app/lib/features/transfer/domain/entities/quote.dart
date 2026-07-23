@@ -1,4 +1,5 @@
 import 'package:bmoni_transfer/core/money/money.dart';
+import 'package:bmoni_transfer/features/transfer/domain/entities/fee_breakdown.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/rate.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -12,6 +13,7 @@ abstract class Quote with _$Quote {
     required String id,
     required Money sourceAmount,
     required Money fee,
+    required FeeBreakdown feeBreakdown,
     required Money destAmount,
     required Rate rate,
     required DateTime expiresAt,

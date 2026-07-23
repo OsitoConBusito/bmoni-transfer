@@ -54,6 +54,10 @@
     "quoteExpired": "This quote expired. Please request a new one.",
     "unexpected": "Something went wrong. Please try again."
   },
+  "feeInfo": {
+    "fixedOnly": "Flat fee of {fixed}.",
+    "combined": "{fixed} flat + {percent}% ({variable}) for amounts over {threshold}."
+  },
   "common": {
     "retry": "Retry",
     "rateValue": "1 MXN ≈ {rate} USD"

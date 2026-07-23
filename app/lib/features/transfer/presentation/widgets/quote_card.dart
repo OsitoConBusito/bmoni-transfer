@@ -1,4 +1,5 @@
 import 'package:bmoni_transfer/features/transfer/domain/entities/quote.dart';
+import 'package:bmoni_transfer/features/transfer/presentation/widgets/fee_explanation.dart';
 import 'package:bmoni_transfer/i18n/strings.g.dart';
 import 'package:bmoni_transfer/shared/design_system/tokens/app_sizing.dart';
 import 'package:bmoni_transfer/shared/design_system/tokens/app_spacing.dart';
@@ -39,6 +40,8 @@ class QuoteCard extends StatelessWidget {
               negative: true,
             ),
           ),
+          const Gap(AppSpacing.xs),
+          FeeExplanation(breakdown: quote.feeBreakdown),
           const Divider(height: AppSpacing.xl),
           _Row(
             label: translations.amountEntry.youReceive,
