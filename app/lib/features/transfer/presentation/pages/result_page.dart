@@ -69,7 +69,7 @@ class _Success extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Spacer(),
+        const Gap(AppSpacing.xl),
         _Badge(icon: Icons.check_rounded, color: positive),
         const Gap(AppSpacing.lg),
         Text(

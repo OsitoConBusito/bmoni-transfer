@@ -25,7 +25,7 @@ class CurrencyInputFormatter extends TextInputFormatter {
     final text = Money(
       minorUnits: int.parse(digits),
       currency: currency,
-    ).format();
+    ).format(withCode: false);
     return TextEditingValue(
       text: text,
       selection: TextSelection.collapsed(offset: text.length),

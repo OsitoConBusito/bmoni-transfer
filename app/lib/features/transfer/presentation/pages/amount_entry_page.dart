@@ -128,7 +128,10 @@ class _AmountHero extends StatelessWidget {
     final colors = theme.extension<AppColors>();
     final hasError = errorText != null;
     final amountColor = hasError ? colors?.fee : theme.colorScheme.onSurface;
-    final zero = const Money(minorUnits: 0, currency: Currency.mxn).format();
+    final zero = const Money(
+      minorUnits: 0,
+      currency: Currency.mxn,
+    ).format(withCode: false);
 
     return Column(
       children: [
