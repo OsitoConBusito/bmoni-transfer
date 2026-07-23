@@ -1,0 +1,242 @@
+================================================================================
+ DECISIONS.txt — bmoni-transfer (slice MXN → USD)
+================================================================================
+
+Este archivo explica el PORQUÉ de las decisiones técnicas. El QUÉ (cómo correr)
+está en README.md; el CONTRATO (endpoints, entidades, reglas, criterios de
+aceptación) en .specs/features/mxn-usd-transfer.md, que es la fuente de verdad.
+
+Take-home de 2-3h. La consigna castiga dos cosas explícitamente, y todo lo demás
+se subordinó a hacerlas bien: (1) representación correcta del dinero y (2)
+transferencia retry-safe (idempotente). El resto de las decisiones se tomaron con
+YAGNI: lo mínimo para que esas dos invariantes sean sólidas y verificables.
+
+
+--------------------------------------------------------------------------------
+ 1. DINERO — enteros, half-up una sola vez, con respaldo regulatorio
+--------------------------------------------------------------------------------
+
+Decisión: TODO el dinero se representa como enteros en "minor units" (centavos MXN
+/ cents USD) dentro de un value object `Money`. Nunca float/double/number decimal,
+ni en el backend ni en el cliente. El wire transporta enteros: `{ minorUnits,
+currency }`, jamás "56.24".
+
+Por qué:
+- Los floats no representan exactamente valores decimales (0.1 + 0.2 != 0.3). En
+  dinero eso es un centavo que aparece o desaparece — inaceptable en remesas.
+- El rate FX (ej. 0.05739) también se guarda como entero escalado (5739 / 100000)
+  y se multiplica con BigInt: cero error de punto flotante en la conversión.
+
+Redondeo: se opera con escala alta durante el cálculo y se redondea HALF-UP UNA
+SOLA VEZ, en el borde (`applyRate`). El bug clásico es el doble redondeo (redondear
+el subtotal y luego el total); acá el destino se calcula (source − fee) * rate en
+una sola pasada. Cubierto por tests dedicados (CA-15: sin doble redondeo).
+
+Respaldo regulatorio (México):
+- La Ley Monetaria mexicana obliga a redondear a 5 centavos SOLO para pagos en
+  EFECTIVO. Una transferencia no es efectivo → se opera al centavo exacto. Por eso
+  el half-up al centavo, no a 5 centavos.
+- Banxico publica el tipo de cambio FIX con 4 decimales en dirección USD/MXN;
+  nosotros trabajamos el inverso MXN→USD a la precisión de la fuente del rate.
+
+El rate NUNCA se hardcodea en el cliente. Viene del backend en cada quote. El
+cliente jamás recalcula dinero: solo muestra lo que el BE le dio (ver §3).
+
+
+--------------------------------------------------------------------------------
+ 2. IDEMPOTENCIA — defensa en profundidad, 3 capas
+--------------------------------------------------------------------------------
+
+Decisión: `POST /transfers` dos veces (doble tap, retry por timeout de red, reenvío)
+no crea dos transferencias ni doble-cobra. Tres capas independientes, cada una
+tapando un hueco distinto:
+
+  (1) Quote single-use (clave natural). Cada `quoteId` se consume una vez. Un
+      segundo POST con la misma quote → 409 QUOTE_ALREADY_USED. Esto por sí solo
+      ataca el doble-cobro sobre la misma cotización.
+
+  (2) Idempotency-Key header (patrón Stripe). El cliente genera un UUID por intento
+      lógico y lo reenvía en cada retry de red. Misma key + mismo quoteId →
+      idempotente, 200 con el transfer YA creado (no uno nuevo). Misma key +
+      quoteId distinto → 409 IDEMPOTENCY_KEY_REUSED (uso indebido de la key).
+      Esto cubre el retry por timeout: el cliente no sabe si el primer POST llegó,
+      reintenta con la misma key, y recibe el mismo resultado.
+
+  (3) Barrera de doble-submit en Flutter (`isSubmitting` + botón deshabilitado).
+      Evita el segundo request antes de que salga. Es UX defensiva, no la frontera
+      real: la autoridad es el BE.
+
+El BE NUNCA confía en dinero del cliente. El body de POST /transfers lleva SOLO
+`{ quoteId }`. El backend recupera la quote guardada, verifica expiración, verifica
+su firma HMAC, y usa SUS PROPIOS valores de rate/fee/USD. Si el cliente mandara
+montos, un atacante podría pedir "10 MXN → 100 USD". Al mandar solo el quoteId, no
+hay superficie de manipulación.
+
+HMAC sobre la quote: al crearla, el BE la firma con un secreto server-side. Al
+confirmar, reverifica la firma (comparación constant-time). Si no verifica → 409
+QUOTE_TAMPERED. Protege la integridad del store in-memory (defensa extra; con DB
+sería la misma idea sobre la fila).
+
+
+--------------------------------------------------------------------------------
+ 3. ARQUITECTURA — hexagonal-light (BE) y Clean Arch feature-first (FE)
+--------------------------------------------------------------------------------
+
+Backend: hexagonal-light (ports & adapters), NO hexagonal "full".
+  domain (VOs, entities, ports RateProvider/Repository/Clock/QuoteSigner)
+    → application (use cases que devuelven Result)
+      → infrastructure (Express, adaptadores de rate, persistencia in-memory)
+
+  Por qué "light" y no full: para un slice de 2-3h, el valor de hexagonal está en
+  que el DOMINIO sea puro y testeable sin HTTP ni red, y en poder swappear el rate
+  provider (Frankfurter ↔ stub) y la persistencia (in-memory ↔ DB) sin tocar la
+  lógica. Eso se logra con puertos e inyección. NO se pagó el costo de DTOs de
+  entrada/salida por capa, mappers bidireccionales, ni un bus de comandos: eso
+  sería ceremonia sin retorno a esta escala (YAGNI).
+
+Frontend: Clean Arch domain-first, feature-first. Una feature `transfer` con
+  domain / data / presentation, más `core/` (dominio + primitivos compartidos:
+  Money, Result, Currency) y `shared/` (infra + UI: dio, router, design system).
+  - domain no importa data ni Flutter.
+  - Los DTOs viven SOLO en data/. El dominio no sabe de JSON.
+  - presentation no salta a data directo: pasa por use cases y el repositorio.
+
+Errores como valor en AMBOS lados: `Result<T, E>` hand-rolled (sin neverthrow ni
+fpdart). Los caminos de fallo esperados (not found, validación, conflicto, quote
+expirada) viajan por `Err(...)`, no por excepción. try/catch queda solo en el
+borde: el handler HTTP (mapear lo inesperado a 500) y el datasource de Flutter.
+Se eligió Result propio para no meter una dependencia por algo de ~40 líneas.
+
+
+--------------------------------------------------------------------------------
+ 4. FX RATE, FEE Y LÍMITES
+--------------------------------------------------------------------------------
+
+Rate: puerto `RateProvider` con dos adaptadores.
+  - FrankfurterRateProvider (default): api.frankfurter.dev, datos del ECB, sin API
+    key, MXN soportado. Elegido por cero fricción para el evaluador (no hay que
+    conseguir una key).
+  - StubRateProvider: determinista, para tests y como fallback offline.
+  Seleccionable por env RATE_PROVIDER. Caché en memoria con TTL (default 60s) sobre
+  el puerto Clock. Si el provider falla y no hay caché válida → 503 RATE_UNAVAILABLE.
+  NUNCA se inventa un rate ni se sirve uno viejo enmascarando el fallo.
+
+Fee escalonado: flat 20 MXN bajo el umbral; sobre 5.000 MXN → 20 + 1% del monto,
+half-up. Configurable por env. El fee se DEDUCE del envío: destAmount =
+(source − fee) * rate. El porcentaje se computa como basis points con math entera
+(1% = 100/10000), sin floats.
+
+Caso borde AMOUNT_BELOW_FEE: el mínimo (10 MXN) es menor que el fee flat (20 MXN),
+así que un monto entre 10 y 20 no cubre el fee y daría un destino negativo. Se
+detecta explícitamente y se devuelve 400 AMOUNT_BELOW_FEE en vez de producir un
+número absurdo.
+
+Determinismo: puerto `Clock` inyectado (SystemClock / FakeClock) en vez de
+Date.now() inline. Así la expiración de la quote y el TTL de la caché se testean
+sin esperas reales.
+
+
+--------------------------------------------------------------------------------
+ 5. ALGO QUE LA IA HIZO MAL Y SE CORRIGIÓ (dos casos reales, atrapados por review)
+--------------------------------------------------------------------------------
+
+El flujo fue: implementar → correr el reviewer del lado tocado (ts-reviewer /
+flutter-reviewer) sobre el diff ANTES de marcar el PR ready. Dos hallazgos
+concretos donde el primer intento generado estaba mal y se corrigió con test de
+regresión:
+
+(a) Datasource de Flutter — mapeo fuera del try/catch (PR#9).
+    El primer intento hacía la llamada HTTP dentro del try, pero mapeaba el JSON a
+    dominio (`toDomain()`) FUERA. Si el backend devolvía un 2xx con cuerpo
+    malformado, el mapeo lanzaba una excepción NO capturada en vez de un
+    `Err(UnexpectedFailure)`. El reviewer lo marcó; se movió el mapeo dentro del
+    try y se agregó un test: un 2xx malformado ahora es un Err limpio, no un crash.
+
+(b) Notifier de la quote — respuesta stale (PR#10).
+    El `QuoteNotifier` debounce-a el input y cancela requests previos con un
+    `_requestId`. El primer intento no bumpeaba el id al LIMPIAR el campo, así que
+    una respuesta en vuelo de un monto viejo podía sobrescribir el estado "idle"
+    tras borrar el input. El reviewer lo atrapó; se corrigió bumpeando el id en
+    ese path y se agregó un test de regresión (campo limpiado mid-flight → la
+    respuesta vieja se ignora). CA cubierto explícitamente.
+
+Ambos son el tipo de bug que compila, pasa el happy path, y solo se ve bajo
+carrera o input malformado. El reviewer automático sobre el diff fue lo que los
+frenó antes de merge.
+
+
+--------------------------------------------------------------------------------
+ 6. QUÉ SE CORTÓ (y por qué está bien cortarlo en este slice)
+--------------------------------------------------------------------------------
+
+- Certificate pinning: DESCARTADO conscientemente. La ventana de evaluación es de
+  días y los PaaS rotan certificados; un pin mal rotado deja la app sin conectar.
+  Se mantiene TLS obligatorio en prod (la app rechaza http no-localhost). El pinning
+  queda documentado como iteración futura en security.md.
+- AuthN/AuthZ, KYC/AML: fuera de scope explícito del slice. Es el gap #1 a atacar
+  post-slice; el diseño lo tiene en cuenta pero no se implementó.
+- Validación de min/max en el cliente: delegada al BE. El cliente valida cero /
+  negativo / no-numérico como UX (no llamar al BE por gusto), pero los límites de
+  monto los impone el backend, que es la autoridad. Duplicarlos en el cliente sería
+  DRY roto: una regla de negocio en dos lugares.
+- Persistencia real (DB): in-memory detrás del puerto Repository. Swappable después
+  sin tocar el dominio. Para un slice no aporta.
+- Onboarding: omitido por decisión de producto.
+- Web: removido del target de Flutter (la demo va por APK/emulador). El CORS del BE
+  se mantiene, inocuo.
+- Andamiaje de proceso pesado (ADRs, DoR/DoD, cops de tokens/i18n/a11y, contract-
+  checker BE↔FE): se adoptó un subset slim (spec SDD recortado + 2 review agents).
+  El resto sería over-engineering para 2-3h; queda anotado como backlog.
+
+
+--------------------------------------------------------------------------------
+ 7. STACK Y TOOLCHAIN
+--------------------------------------------------------------------------------
+
+Backend:  Express 5 + Zod (TS strict, sin `any`) · Node 22 LTS · ESM · tsx (dev
+          sin build) · Vitest + supertest · Biome (lint+format) · pino (nunca
+          console.log) · helmet + CORS allowlist + rate-limit. npm sobre pnpm:
+          cero fricción para el evaluador.
+
+Frontend: Flutter + Riverpod 3.0 con code generation (@riverpod) · dio
+          (interceptor de Idempotency-Key + mapeo de errores) · freezed +
+          json_serializable (VOs/entities/DTOs) · slang (i18n en+es, cero strings
+          hardcodeados, extensible con un archivo) · go_router · intl (formato de
+          dinero, MXN es_MX / USD en_US) · mocktail (tests) · very_good_analysis.
+          BASE_URL por --dart-define (default 10.0.2.2:3000, emulador Android).
+
+Metodología: SDD (spec antes que código) + Trunk-Based Development con feature
+branches cortas → PR (template) → squash-merge a main. Cada PR trackea archivos,
+CAs del spec cubiertos, test plan y tiempo estimado vs real.
+
+
+--------------------------------------------------------------------------------
+ 8. TIEMPO ESTIMADO VS REAL (por PR)
+--------------------------------------------------------------------------------
+
+PR#   Unidad                                       Estimado   Real
+----  -------------------------------------------  --------   --------
+#1    Import diseño + extracción de tokens          20m        ~15m
+#2    Money + Rate value objects (int math)         45m        ~40m
+#3    Fee policy escalonado                         25m        ~20m
+#4    RateProvider (frankfurter+stub) + Clock+TTL   40m        ~35m
+#5    GET /quote (validación, pricing, Result→HTTP) 1h 15m     ~1h 10m
+#6    POST /transfers (idempotencia 3 capas + HMAC) 1h 30m     ~1h 25m
+#7    Scaffold Flutter + core temado                40m        ~45m
+#8    Core layer (Money, Result, dio, i18n)         50m        ~1h
+#9    Transfer domain + data                        1h 30m     ~2h
+#10   Presentation state (notifiers + providers)    1h         ~1h 45m
+#11   3 pantallas + go_router + DS                  2h         ~2h 40m
+#12   Fix de localización (delegates es)            —          ~15m
+----  -------------------------------------------  --------   --------
+      TOTAL backend  (#1-6 sin #1)                  ~4h 35m    ~4h 25m
+      TOTAL frontend (#7-12)                        ~6h 20m    ~8h 25m
+      TOTAL global                                  ~11h       ~12h 35m
+
+Lectura del desvío: el backend cayó dentro de lo estimado (dominio puro, bien
+acotado, tests rápidos). El frontend se pasó ~30%, concentrado en #9-#11: la reorg
+de Clean Arch (core/ vs shared/), el codegen (freezed + slang + riverpod) y los
+ajustes pedidos por el reviewer (rate a i18n, magic numbers a tokens, los dos bugs
+de §5) sumaron más de lo previsto. Es el costo real de mantener la barra de calidad
+—no se recortó para llegar al número—; el aprendizaje es estimar el frontend con
+codegen y review con más colchón.
