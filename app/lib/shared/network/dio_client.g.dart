@@ -8,16 +8,12 @@ part of 'dio_client.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The configured HTTP client, based at the versioned API prefix.
 
 @ProviderFor(dio)
 final dioProvider = DioProvider._();
 
-/// The configured HTTP client, based at the versioned API prefix.
-
 final class DioProvider extends $FunctionalProvider<Dio, Dio, Dio>
     with $Provider<Dio> {
-  /// The configured HTTP client, based at the versioned API prefix.
   DioProvider._()
     : super(
         from: null,
@@ -51,4 +47,4 @@ final class DioProvider extends $FunctionalProvider<Dio, Dio, Dio>
   }
 }
 
-String _$dioHash() => r'9d630bbdd22e06d51a78951f648d803ae3b0ba59';
+String _$dioHash() => r'5973d94ab45af25c0b3290729149aa588d1e719f';
