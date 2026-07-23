@@ -11,11 +11,26 @@ abstract class QuoteDto with _$QuoteDto {
     required String quoteId,
     required MoneyDto sourceAmount,
     required MoneyDto fee,
+    required FeeBreakdownDto feeBreakdown,
     required MoneyDto destAmount,
     required RateDto rate,
+    required String createdAt,
     required String expiresAt,
   }) = _QuoteDto;
 
   factory QuoteDto.fromJson(Map<String, dynamic> json) =>
       _$QuoteDtoFromJson(json);
+}
+
+@freezed
+abstract class FeeBreakdownDto with _$FeeBreakdownDto {
+  const factory FeeBreakdownDto({
+    required MoneyDto fixed,
+    required MoneyDto variable,
+    required MoneyDto threshold,
+    required int percentBasisPoints,
+  }) = _FeeBreakdownDto;
+
+  factory FeeBreakdownDto.fromJson(Map<String, dynamic> json) =>
+      _$FeeBreakdownDtoFromJson(json);
 }

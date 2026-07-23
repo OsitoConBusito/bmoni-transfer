@@ -51,6 +51,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$confirmation$en confirmation = Translations$confirmation$en._(_root);
 	late final Translations$result$en result = Translations$result$en._(_root);
 	late final Translations$errors$en errors = Translations$errors$en._(_root);
+	late final Translations$feeInfo$en feeInfo = Translations$feeInfo$en._(_root);
 	late final Translations$common$en common = Translations$common$en._(_root);
 }
 
@@ -64,6 +65,18 @@ class Translations$amountEntry$en {
 
 	/// en: 'Send money'
 	String get title => 'Send money';
+
+	/// en: 'To'
+	String get recipientTo => 'To';
+
+	/// en: 'Wallet ···· 4821'
+	String get recipientAccount => 'Wallet ···· 4821';
+
+	/// en: 'Change'
+	String get recipientChange => 'Change';
+
+	/// en: 'YOU SEND · MXN'
+	String get heroLabel => 'YOU SEND · MXN';
 
 	/// en: 'You send (MXN)'
 	String get amountLabel => 'You send (MXN)';
@@ -80,6 +93,9 @@ class Translations$amountEntry$en {
 	/// en: 'Fee'
 	String get fee => 'Fee';
 
+	/// en: 'Enter an amount to see how much they receive in dollars.'
+	String get emptyHint => 'Enter an amount to see how much they receive in dollars.';
+
 	/// en: 'Continue'
 	String get continueCta => 'Continue';
 }
@@ -92,8 +108,11 @@ class Translations$confirmation$en {
 
 	// Translations
 
-	/// en: 'Confirm transfer'
-	String get title => 'Confirm transfer';
+	/// en: 'Confirm your transfer'
+	String get title => 'Confirm your transfer';
+
+	/// en: 'YOU'RE SENDING'
+	String get heroLabel => 'YOU\'RE SENDING';
 
 	/// en: 'You send'
 	String get youSend => 'You send';
@@ -101,23 +120,35 @@ class Translations$confirmation$en {
 	/// en: 'Fee'
 	String get fee => 'Fee';
 
-	/// en: 'Rate'
-	String get rate => 'Rate';
+	/// en: 'Converted'
+	String get converted => 'Converted';
+
+	/// en: 'Exchange rate'
+	String get rate => 'Exchange rate';
 
 	/// en: 'Recipient gets'
 	String get youReceive => 'Recipient gets';
 
+	/// en: 'This rate holds for'
+	String get rateHold => 'This rate holds for';
+
 	/// en: 'Quote expires in {seconds}s'
 	String expiresIn({required Object seconds}) => 'Quote expires in ${seconds}s';
 
-	/// en: 'This quote expired'
-	String get expiredTitle => 'This quote expired';
+	/// en: 'The quote expired'
+	String get expiredTitle => 'The quote expired';
 
-	/// en: 'Back to quote'
-	String get backToQuote => 'Back to quote';
+	/// en: 'The exchange rate may have changed — request a new quote to continue.'
+	String get expiredBody => 'The exchange rate may have changed — request a new quote to continue.';
+
+	/// en: 'Get a new quote'
+	String get backToQuote => 'Get a new quote';
 
 	/// en: 'Confirm and send'
 	String get confirmCta => 'Confirm and send';
+
+	/// en: 'Sending…'
+	String get sending => 'Sending…';
 }
 
 // Path: result
@@ -128,11 +159,26 @@ class Translations$result$en {
 
 	// Translations
 
-	/// en: 'Transfer completed'
-	String get successTitle => 'Transfer completed';
+	/// en: 'Sent!'
+	String get sentTitle => 'Sent!';
 
-	/// en: '{amount} is on its way.'
-	String successBody({required Object amount}) => '${amount} is on its way.';
+	/// en: 'The recipient will receive'
+	String get recipientWillReceive => 'The recipient will receive';
+
+	/// en: 'Available in ~2 minutes'
+	String get availableIn => 'Available in ~2 minutes';
+
+	/// en: 'Reference'
+	String get reference => 'Reference';
+
+	/// en: 'You sent'
+	String get youSent => 'You sent';
+
+	/// en: 'Date'
+	String get date => 'Date';
+
+	/// en: 'Send another'
+	String get sendAnother => 'Send another';
 
 	/// en: 'Transfer failed'
 	String get failureTitle => 'Transfer failed';
@@ -180,6 +226,21 @@ class Translations$errors$en {
 	String get unexpected => 'Something went wrong. Please try again.';
 }
 
+// Path: feeInfo
+class Translations$feeInfo$en {
+	Translations$feeInfo$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Flat fee of {fixed}.'
+	String fixedOnly({required Object fixed}) => 'Flat fee of ${fixed}.';
+
+	/// en: '{fixed} flat + {percent}% ({variable}) for amounts over {threshold}.'
+	String combined({required Object fixed, required Object percent, required Object variable, required Object threshold}) => '${fixed} flat + ${percent}% (${variable}) for amounts over ${threshold}.';
+}
+
 // Path: common
 class Translations$common$en {
 	Translations$common$en._(this._root);
@@ -206,23 +267,38 @@ extension on Translations {
 			'appName' => 'BMONI',
 			'tagline' => 'Send money from Mexico to the US',
 			'amountEntry.title' => 'Send money',
+			'amountEntry.recipientTo' => 'To',
+			'amountEntry.recipientAccount' => 'Wallet ···· 4821',
+			'amountEntry.recipientChange' => 'Change',
+			'amountEntry.heroLabel' => 'YOU SEND · MXN',
 			'amountEntry.amountLabel' => 'You send (MXN)',
 			'amountEntry.amountHint' => '0.00',
 			'amountEntry.youReceive' => 'Recipient gets',
 			'amountEntry.rate' => 'Exchange rate',
 			'amountEntry.fee' => 'Fee',
+			'amountEntry.emptyHint' => 'Enter an amount to see how much they receive in dollars.',
 			'amountEntry.continueCta' => 'Continue',
-			'confirmation.title' => 'Confirm transfer',
+			'confirmation.title' => 'Confirm your transfer',
+			'confirmation.heroLabel' => 'YOU\'RE SENDING',
 			'confirmation.youSend' => 'You send',
 			'confirmation.fee' => 'Fee',
-			'confirmation.rate' => 'Rate',
+			'confirmation.converted' => 'Converted',
+			'confirmation.rate' => 'Exchange rate',
 			'confirmation.youReceive' => 'Recipient gets',
+			'confirmation.rateHold' => 'This rate holds for',
 			'confirmation.expiresIn' => ({required Object seconds}) => 'Quote expires in ${seconds}s',
-			'confirmation.expiredTitle' => 'This quote expired',
-			'confirmation.backToQuote' => 'Back to quote',
+			'confirmation.expiredTitle' => 'The quote expired',
+			'confirmation.expiredBody' => 'The exchange rate may have changed — request a new quote to continue.',
+			'confirmation.backToQuote' => 'Get a new quote',
 			'confirmation.confirmCta' => 'Confirm and send',
-			'result.successTitle' => 'Transfer completed',
-			'result.successBody' => ({required Object amount}) => '${amount} is on its way.',
+			'confirmation.sending' => 'Sending…',
+			'result.sentTitle' => 'Sent!',
+			'result.recipientWillReceive' => 'The recipient will receive',
+			'result.availableIn' => 'Available in ~2 minutes',
+			'result.reference' => 'Reference',
+			'result.youSent' => 'You sent',
+			'result.date' => 'Date',
+			'result.sendAnother' => 'Send another',
 			'result.failureTitle' => 'Transfer failed',
 			'result.retryCta' => 'Try again',
 			'result.doneCta' => 'Done',
@@ -235,6 +311,8 @@ extension on Translations {
 			'errors.amountBelowFee' => 'Amount must be greater than the fee.',
 			'errors.quoteExpired' => 'This quote expired. Please request a new one.',
 			'errors.unexpected' => 'Something went wrong. Please try again.',
+			'feeInfo.fixedOnly' => ({required Object fixed}) => 'Flat fee of ${fixed}.',
+			'feeInfo.combined' => ({required Object fixed, required Object percent, required Object variable, required Object threshold}) => '${fixed} flat + ${percent}% (${variable}) for amounts over ${threshold}.',
 			'common.retry' => 'Retry',
 			'common.rateValue' => ({required Object rate}) => '1 MXN ≈ ${rate} USD',
 			_ => null,

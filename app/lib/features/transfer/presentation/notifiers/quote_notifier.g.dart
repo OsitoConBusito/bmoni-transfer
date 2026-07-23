@@ -33,7 +33,7 @@ final class QuoteNotifierProvider
   QuoteNotifier create() => QuoteNotifier();
 }
 
-String _$quoteNotifierHash() => r'd554b2c4d92e2b08d8ce65b91ab83ad25f772d69';
+String _$quoteNotifierHash() => r'520c9e993f3404253e19a0211644894dcc96eebb';
 
 abstract class _$QuoteNotifier extends $AsyncNotifier<Quote?> {
   FutureOr<Quote?> build();

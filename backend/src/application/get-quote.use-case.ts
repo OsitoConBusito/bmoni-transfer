@@ -32,7 +32,8 @@ export class GetQuoteUseCase {
       return amount;
     }
 
-    const fee = this.deps.feePolicy.computeFor(amount.value);
+    const feeBreakdown = this.deps.feePolicy.breakdownFor(amount.value);
+    const fee = feeBreakdown.fixed.plus(feeBreakdown.variable);
     if (!amount.value.isGreaterThan(fee)) {
       return err(
         validationError(
@@ -57,6 +58,7 @@ export class GetQuoteUseCase {
         sourceAmount: amount.value,
         rate: rate.value,
         fee,
+        feeBreakdown,
         createdAt,
         ttlMs: this.deps.quoteTtlMs,
       },

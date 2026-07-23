@@ -4,6 +4,7 @@ import 'package:bmoni_transfer/features/transfer/data/dtos/money_dto.dart';
 import 'package:bmoni_transfer/features/transfer/data/dtos/quote_dto.dart';
 import 'package:bmoni_transfer/features/transfer/data/dtos/rate_dto.dart';
 import 'package:bmoni_transfer/features/transfer/data/dtos/transfer_dto.dart';
+import 'package:bmoni_transfer/features/transfer/domain/entities/fee_breakdown.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/quote.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/rate.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/transfer.dart';
@@ -23,9 +24,20 @@ extension QuoteDtoMapper on QuoteDto {
     id: quoteId,
     sourceAmount: sourceAmount.toDomain(),
     fee: fee.toDomain(),
+    feeBreakdown: feeBreakdown.toDomain(),
     destAmount: destAmount.toDomain(),
     rate: rate.toDomain(),
+    createdAt: DateTime.parse(createdAt),
     expiresAt: DateTime.parse(expiresAt),
+  );
+}
+
+extension FeeBreakdownDtoMapper on FeeBreakdownDto {
+  FeeBreakdown toDomain() => FeeBreakdown(
+    fixed: fixed.toDomain(),
+    variable: variable.toDomain(),
+    threshold: threshold.toDomain(),
+    percentBasisPoints: percentBasisPoints,
   );
 }
 
@@ -36,6 +48,7 @@ extension TransferDtoMapper on TransferDto {
     sourceAmount: sourceAmount.toDomain(),
     destAmount: destAmount.toDomain(),
     fee: fee.toDomain(),
+    rate: rate.toDomain(),
     createdAt: DateTime.parse(createdAt),
   );
 }

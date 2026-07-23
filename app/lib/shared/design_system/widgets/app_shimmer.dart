@@ -31,11 +31,21 @@ class AppShimmerBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // An opaque placeholder just above the card tone — never stark white. The
+    // Shimmer sweep animates over it; white would flash on the dark theme.
+    final theme = Theme.of(context);
+    final base =
+        theme.extension<AppColors>()?.surfaceRaised ??
+        theme.colorScheme.surfaceContainerHighest;
+    final placeholder = Color.alphaBlend(
+      theme.colorScheme.onSurface.withValues(alpha: 0.10),
+      base,
+    );
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: placeholder,
         borderRadius: BorderRadius.circular(AppRadii.sm),
       ),
     );

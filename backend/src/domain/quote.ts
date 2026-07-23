@@ -1,4 +1,5 @@
 import { Currency } from "./currency.js";
+import type { FeeBreakdown } from "./fee.js";
 import type { Money } from "./money.js";
 import type { QuoteSigner } from "./ports/quote-signer.js";
 import type { Rate } from "./rate.js";
@@ -14,6 +15,7 @@ export class Quote {
     readonly sourceAmount: Money,
     readonly rate: Rate,
     readonly fee: Money,
+    readonly feeBreakdown: FeeBreakdown,
     readonly destAmount: Money,
     readonly createdAt: number,
     readonly expiresAt: number,
@@ -26,6 +28,7 @@ export class Quote {
       sourceAmount: Money;
       rate: Rate;
       fee: Money;
+      feeBreakdown: FeeBreakdown;
       createdAt: number;
       ttlMs: number;
     },
@@ -47,6 +50,7 @@ export class Quote {
       params.sourceAmount,
       params.rate,
       params.fee,
+      params.feeBreakdown,
       destAmount,
       params.createdAt,
       expiresAt,

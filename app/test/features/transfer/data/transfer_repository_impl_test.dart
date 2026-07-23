@@ -4,6 +4,7 @@ import 'package:bmoni_transfer/core/money/money.dart';
 import 'package:bmoni_transfer/core/result/result.dart';
 import 'package:bmoni_transfer/features/transfer/data/datasources/transfer_remote_datasource.dart';
 import 'package:bmoni_transfer/features/transfer/data/transfer_repository_impl.dart';
+import 'package:bmoni_transfer/features/transfer/domain/entities/fee_breakdown.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/quote.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/rate.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/transfer.dart';
@@ -17,13 +18,21 @@ const _mxn = Money(minorUnits: 100000, currency: Currency.mxn);
 const _fee = Money(minorUnits: 2000, currency: Currency.mxn);
 const _usd = Money(minorUnits: 5624, currency: Currency.usd);
 const _rate = Rate(value: '0.05739', source: 'stub', asOf: '2026-07-22');
+const _feeBreakdown = FeeBreakdown(
+  fixed: _fee,
+  variable: Money(minorUnits: 0, currency: Currency.mxn),
+  threshold: Money(minorUnits: 500000, currency: Currency.mxn),
+  percentBasisPoints: 100,
+);
 
 final _quote = Quote(
   id: 'q1',
   sourceAmount: _mxn,
   fee: _fee,
+  feeBreakdown: _feeBreakdown,
   destAmount: _usd,
   rate: _rate,
+  createdAt: DateTime.utc(2026, 7, 22, 19),
   expiresAt: DateTime.utc(2026, 7, 22, 19, 1),
 );
 
@@ -33,6 +42,7 @@ final _transfer = Transfer(
   sourceAmount: _mxn,
   destAmount: _usd,
   fee: _fee,
+  rate: _rate,
   createdAt: DateTime.utc(2026, 7, 22, 19),
 );
 

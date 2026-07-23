@@ -43,6 +43,7 @@ class TranslationsEs with BaseTranslations<AppLocale, Translations> implements T
 	@override late final _Translations$confirmation$es confirmation = _Translations$confirmation$es._(_root);
 	@override late final _Translations$result$es result = _Translations$result$es._(_root);
 	@override late final _Translations$errors$es errors = _Translations$errors$es._(_root);
+	@override late final _Translations$feeInfo$es feeInfo = _Translations$feeInfo$es._(_root);
 	@override late final _Translations$common$es common = _Translations$common$es._(_root);
 }
 
@@ -54,11 +55,16 @@ class _Translations$amountEntry$es implements Translations$amountEntry$en {
 
 	// Translations
 	@override String get title => 'Enviar dinero';
+	@override String get recipientTo => 'Para';
+	@override String get recipientAccount => 'Cuenta ···· 4821';
+	@override String get recipientChange => 'Cambiar';
+	@override String get heroLabel => 'TÚ ENVÍAS · MXN';
 	@override String get amountLabel => 'Envías (MXN)';
 	@override String get amountHint => '0.00';
 	@override String get youReceive => 'El destinatario recibe';
 	@override String get rate => 'Tipo de cambio';
 	@override String get fee => 'Comisión';
+	@override String get emptyHint => 'Escribe un monto para ver cuánto recibe en dólares.';
 	@override String get continueCta => 'Continuar';
 }
 
@@ -69,15 +75,20 @@ class _Translations$confirmation$es implements Translations$confirmation$en {
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Confirmar transferencia';
+	@override String get title => 'Confirma tu envío';
+	@override String get heroLabel => 'VAS A ENVIAR';
 	@override String get youSend => 'Envías';
 	@override String get fee => 'Comisión';
+	@override String get converted => 'Se convierten';
 	@override String get rate => 'Tipo de cambio';
 	@override String get youReceive => 'El destinatario recibe';
+	@override String get rateHold => 'Este tipo de cambio se mantiene por';
 	@override String expiresIn({required Object seconds}) => 'La cotización expira en ${seconds}s';
-	@override String get expiredTitle => 'Esta cotización expiró';
+	@override String get expiredTitle => 'La cotización expiró';
+	@override String get expiredBody => 'El tipo de cambio pudo haber cambiado — vuelve a cotizar para continuar.';
 	@override String get backToQuote => 'Volver a cotizar';
 	@override String get confirmCta => 'Confirmar y enviar';
+	@override String get sending => 'Enviando…';
 }
 
 // Path: result
@@ -87,8 +98,13 @@ class _Translations$result$es implements Translations$result$en {
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get successTitle => 'Transferencia completada';
-	@override String successBody({required Object amount}) => '${amount} va en camino.';
+	@override String get sentTitle => '¡Enviado!';
+	@override String get recipientWillReceive => 'El destinatario recibirá';
+	@override String get availableIn => 'Disponible en ~2 minutos';
+	@override String get reference => 'Folio';
+	@override String get youSent => 'Enviaste';
+	@override String get date => 'Fecha';
+	@override String get sendAnother => 'Enviar otro';
 	@override String get failureTitle => 'La transferencia falló';
 	@override String get retryCta => 'Reintentar';
 	@override String get doneCta => 'Listo';
@@ -110,6 +126,17 @@ class _Translations$errors$es implements Translations$errors$en {
 	@override String get amountBelowFee => 'El monto debe ser mayor a la comisión.';
 	@override String get quoteExpired => 'Esta cotización expiró. Solicita una nueva.';
 	@override String get unexpected => 'Algo salió mal. Intenta de nuevo.';
+}
+
+// Path: feeInfo
+class _Translations$feeInfo$es implements Translations$feeInfo$en {
+	_Translations$feeInfo$es._(this._root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String fixedOnly({required Object fixed}) => 'Tarifa fija de ${fixed}.';
+	@override String combined({required Object fixed, required Object percent, required Object variable, required Object threshold}) => '${fixed} fija + ${percent}% (${variable}) por superar ${threshold}.';
 }
 
 // Path: common
@@ -134,23 +161,38 @@ extension on TranslationsEs {
 			'appName' => 'BMONI',
 			'tagline' => 'Envía dinero de México a Estados Unidos',
 			'amountEntry.title' => 'Enviar dinero',
+			'amountEntry.recipientTo' => 'Para',
+			'amountEntry.recipientAccount' => 'Cuenta ···· 4821',
+			'amountEntry.recipientChange' => 'Cambiar',
+			'amountEntry.heroLabel' => 'TÚ ENVÍAS · MXN',
 			'amountEntry.amountLabel' => 'Envías (MXN)',
 			'amountEntry.amountHint' => '0.00',
 			'amountEntry.youReceive' => 'El destinatario recibe',
 			'amountEntry.rate' => 'Tipo de cambio',
 			'amountEntry.fee' => 'Comisión',
+			'amountEntry.emptyHint' => 'Escribe un monto para ver cuánto recibe en dólares.',
 			'amountEntry.continueCta' => 'Continuar',
-			'confirmation.title' => 'Confirmar transferencia',
+			'confirmation.title' => 'Confirma tu envío',
+			'confirmation.heroLabel' => 'VAS A ENVIAR',
 			'confirmation.youSend' => 'Envías',
 			'confirmation.fee' => 'Comisión',
+			'confirmation.converted' => 'Se convierten',
 			'confirmation.rate' => 'Tipo de cambio',
 			'confirmation.youReceive' => 'El destinatario recibe',
+			'confirmation.rateHold' => 'Este tipo de cambio se mantiene por',
 			'confirmation.expiresIn' => ({required Object seconds}) => 'La cotización expira en ${seconds}s',
-			'confirmation.expiredTitle' => 'Esta cotización expiró',
+			'confirmation.expiredTitle' => 'La cotización expiró',
+			'confirmation.expiredBody' => 'El tipo de cambio pudo haber cambiado — vuelve a cotizar para continuar.',
 			'confirmation.backToQuote' => 'Volver a cotizar',
 			'confirmation.confirmCta' => 'Confirmar y enviar',
-			'result.successTitle' => 'Transferencia completada',
-			'result.successBody' => ({required Object amount}) => '${amount} va en camino.',
+			'confirmation.sending' => 'Enviando…',
+			'result.sentTitle' => '¡Enviado!',
+			'result.recipientWillReceive' => 'El destinatario recibirá',
+			'result.availableIn' => 'Disponible en ~2 minutos',
+			'result.reference' => 'Folio',
+			'result.youSent' => 'Enviaste',
+			'result.date' => 'Fecha',
+			'result.sendAnother' => 'Enviar otro',
 			'result.failureTitle' => 'La transferencia falló',
 			'result.retryCta' => 'Reintentar',
 			'result.doneCta' => 'Listo',
@@ -163,6 +205,8 @@ extension on TranslationsEs {
 			'errors.amountBelowFee' => 'El monto debe ser mayor a la comisión.',
 			'errors.quoteExpired' => 'Esta cotización expiró. Solicita una nueva.',
 			'errors.unexpected' => 'Algo salió mal. Intenta de nuevo.',
+			'feeInfo.fixedOnly' => ({required Object fixed}) => 'Tarifa fija de ${fixed}.',
+			'feeInfo.combined' => ({required Object fixed, required Object percent, required Object variable, required Object threshold}) => '${fixed} fija + ${percent}% (${variable}) por superar ${threshold}.',
 			'common.retry' => 'Reintentar',
 			'common.rateValue' => ({required Object rate}) => '1 MXN ≈ ${rate} USD',
 			_ => null,

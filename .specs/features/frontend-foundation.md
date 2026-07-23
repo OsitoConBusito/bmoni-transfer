@@ -1,101 +1,129 @@
-# Spec: frontend-foundation — design system, i18n y theming
+# Spec: frontend-foundation — design system, i18n and theming
 
-> Estado: DRAFT
-> Última revisión: 2026-07-22
-> Cross-cutting del app Flutter. La feature `transfer` consume esta base.
-> Contrato de negocio: ver [mxn-usd-transfer.md](mxn-usd-transfer.md).
+> Status: DRAFT
+> Last reviewed: 2026-07-22
+> Cross-cutting for the Flutter app. The `transfer` feature consumes this
+> foundation. Business contract: see [mxn-usd-transfer.md](mxn-usd-transfer.md).
 
 ---
 
-## Objetivo
+## Goal
 
-Base de UI consistente para el app: un **design system mínimo** (tokens + widgets),
-**i18n** (inglés + español, extensible a cualquier idioma) y **tema claro/oscuro**.
-Principio: consistente y usable, no pixel-perfect (alineado con el brief).
+A consistent UI foundation for the app: a **minimal design system** (tokens
++ widgets), **i18n** (English + Spanish, extensible to any language), and a
+**light/dark theme**. Principle: consistent and usable, not pixel-perfect
+(matching the brief).
 
-## Fuera de alcance
-- Componentes ricos (empty states, shimmers, dialogs, banners) más allá de lo que usan las
-  3 pantallas de `transfer`.
-- Traducción a idiomas de Nigeria **hoy** (la infra los soporta; se agregan añadiendo un archivo
-  de traducción — ver Backlog). BMONI opera el corredor Nigeria↔; queda listo para localizar.
+## Out of scope
+- Rich components (empty states, shimmers, dialogs, banners) beyond what
+  the `transfer` feature's 3 screens use.
+- Translating into Nigerian languages **today** (the infra supports it; add
+  them by adding a translation file — see Backlog). BMONI operates the
+  Nigeria corridor, so this stays ready to localize.
 
 ---
 
 ## Design system (`core/design_system/`)
 
 ### Tokens (`tokens/`)
-Constantes semánticas, única fuente de verdad. Nada de magic numbers/hex en widgets.
-- **Spacing:** escala `AppSpacing` (`xs 4, sm 8, md 16, lg 24, xl 32`).
+Semantic constants, the single source of truth. No magic numbers/hex in
+widgets.
+- **Spacing:** the `AppSpacing` scale (`xs 4, sm 8, md 16, lg 24, xl 32`).
 - **Radii:** `AppRadii` (`sm 8, md 12, lg 16`).
-- **Typography:** `AppTypography` — deriva del `TextTheme` de Material 3; roles nombrados
-  (`amountDisplay`, `rateCaption`, `bodyLabel`).
-- **Semantic colors:** viven en un `ThemeExtension` (ver Theming), no como constantes sueltas.
+- **Typography:** `AppTypography` — derives from Material 3's `TextTheme`;
+  named roles (`amountDisplay`, `rateCaption`, `bodyLabel`).
+- **Semantic colors:** live in a `ThemeExtension` (see Theming), not as
+  loose constants.
 
 ### Widgets (`widgets/`)
-Set mínimo reutilizable, todos widgets-como-clase:
-- `AppScaffold` — padding y estructura consistentes.
-- `AppButton` — primario/secundario, con estado `isLoading`/`isEnabled` (soporta la barrera de doble-submit).
-- `AppTextField` — input con label, error inline y `keyboardType` numérico para el monto.
-- `AppCard` — contenedor del desglose de la quote.
-- `AppMoneyText` — renderiza un `Money` con `intl` según su `Currency` (MXN→es_MX, USD→en_US);
-  usa el color semántico (positive/negative) cuando aplica. **Nunca** se concatena dinero a mano.
-- Estados: `AppLoading`, `AppErrorState` (con reintento) — usados por los estados del spec de transfer.
+A minimal, reusable set, all widgets-as-classes:
+- `AppScaffold` — consistent padding and structure.
+- `AppButton` — primary/secondary, with `isLoading`/`isEnabled` state
+  (supports the double-submit barrier).
+- `AppTextField` — input with a label, inline error, and a numeric
+  `keyboardType` for the amount.
+- `AppCard` — container for the quote breakdown.
+- `AppMoneyText` — renders a `Money` with `intl` per its `Currency`
+  (MXN→es_MX, USD→en_US); uses the semantic color (positive/negative) when
+  applicable. Money is **never** hand-concatenated.
+- States: `AppLoading`, `AppErrorState` (with retry) — used by the
+  transfer spec's states.
 
 ---
 
 ## i18n (`slang`)
 
-- **slang** (type-safe, sin `BuildContext`): traducciones en `lib/i18n/*.i18n.json`, acceso `t.x.y`.
-- **Locales hoy:** `en` (base) + `es`. Agregar un idioma = agregar `strings_<locale>.i18n.json` +
-  regenerar; cero cambios de código. Documentar en README cómo sumar (ej. `pcm`, `yo`, `ha`, `ig`).
-- **Cambio de idioma en runtime** vía provider Riverpod (`localeProvider`); default = locale del dispositivo
-  con fallback a `en`.
-- **Regla dura:** cero strings de UI hardcodeados; todo texto visible sale de `t.*`. Los mensajes de
-  error del BE se mapean por `code` a una clave de i18n (no se muestra el `message` crudo del wire).
+- **slang** (type-safe, no `BuildContext`): translations in
+  `lib/i18n/*.i18n.json`, accessed via `t.x.y`.
+- **Locales today:** `en` (base) + `es`. Adding a language = adding
+  `strings_<locale>.i18n.json` + regenerating; zero code changes. Document
+  in the README how to add one (e.g. `pcm`, `yo`, `ha`, `ig`).
+- **Runtime language switch** via a Riverpod provider (`localeProvider`);
+  default = the device's locale, falling back to `en`.
+- **Hard rule:** zero hardcoded UI strings; every visible string comes from
+  `t.*`. Backend error messages are mapped by `code` to an i18n key (the
+  raw wire `message` is never shown).
 
 ---
 
-## Fuente de verdad de la UI: diseño de Claude Design
+## Source of truth for the UI: the Claude Design mockup
 
-`design/BMONI.dc.html` (importado del proyecto "BMONI remesas fintech UI") es la **referencia
-visual autoritativa**. Implementamos **sin la pantalla de onboarding** (decisión del usuario).
-Los widgets del DS y el theme se derivan de sus tokens (abajo).
+`design/BMONI.dc.html` (imported from the "BMONI remesas fintech UI"
+project) is the **authoritative visual reference**. Implemented **without
+the onboarding screen** (a user decision). The DS widgets and theme are
+derived from its tokens (below).
 
-### Assets de marca
-`app/assets/brand/`: `bmoni-logo.webp`, `bmoni-logo-white.webp`, `bmoni-favicon.png` (de bmoni.com).
-Nota: el diseño usa un logo-mark propio (una "b" en gradiente teal). Decidir en implementación entre
-el mark del diseño y el logo real; ambos disponibles.
+### Brand assets
+`app/assets/brand/`: `bmoni-logo.webp`, `bmoni-logo-white.webp`,
+`bmoni-favicon.png` (from bmoni.com). Note: the mockup uses its own
+logo-mark (a "b" on a teal gradient). Decide at implementation time between
+the mockup's mark and the real logo; both are available.
 
-### Design tokens (extraídos de `BMONI.dc.html`) — tema dark fintech, acento teal
-- **Fuentes:** `Plus Jakarta Sans` (UI/body) + `Space Grotesk` (display de montos / marca).
-- **Acento:** `teal #37C2CB` (primario) · `#5AD3DB` (hover) · `#0F7A82` (deep) · `#04262A` (darkest).
-- **Superficies (dark):** `#0B0F14` (fondo base) · `#12181F` · `#1A222B` · `#1C2530` · `#263039` (cards/borders).
-- **Texto:** `#F3F5F7` (bright) · `#E7ECF1` (primario) · `#A2AEBB`/`#9AA6B2` (secundario) · `#6B7683` (muted).
-- **Radii:** cards `12/16/18`, pill `999`, hero `42`. **Semánticos de dinero:** definir `positive`
-  (USD recibido), `negative`/`fee`, `warning` (expiración) desde la paleta del diseño.
+### Design tokens (extracted from `BMONI.dc.html`) — dark fintech theme, teal accent
+- **Fonts:** `Plus Jakarta Sans` (UI/body) + `Space Grotesk` (amount
+  display / brand).
+- **Accent:** `teal #37C2CB` (primary) · `#5AD3DB` (hover) · `#0F7A82`
+  (deep) · `#04262A` (darkest).
+- **Surfaces (dark):** `#0B0F14` (base background) · `#12181F` ·
+  `#1A222B` · `#1C2530` · `#263039` (cards/borders).
+- **Text:** `#F3F5F7` (bright) · `#E7ECF1` (primary) · `#A2AEBB`/`#9AA6B2`
+  (secondary) · `#6B7683` (muted).
+- **Radii:** cards `12/16/18`, pill `999`, hero `42`. **Money semantics:**
+  define `positive` (USD received), `negative`/`fee`, `warning` (expiry)
+  from the mockup's palette.
 
 ## Theming (`core/theme/`)
 
-- `ThemeData` desde **`ColorScheme.fromSeed(seedColor: teal #37C2CB, brightness: dark)`** como base
-  (el diseño es dark-first) + variante clara. `AppColors` ThemeExtension con los semánticos de dinero.
-  Los valores exactos salen de los tokens de `BMONI.dc.html`.
-- **`AppColors` (ThemeExtension)** con los colores semánticos que M3 no cubre:
-  `positive` (recibe USD), `negative`/`fee`, `warning` (quote por expirar). Se resuelven por brillo
-  del tema; los widgets leen `Theme.of(context).extension<AppColors>()`, nunca hex.
-- **`ThemeMode`**: default `system` (sigue el SO) + toggle manual vía provider Riverpod (`themeModeProvider`).
-- Ambos temas deben verse correctos; el countdown de expiración usa `warning`, el USD recibido `positive`.
+- `ThemeData` built from **`ColorScheme.fromSeed(seedColor: teal #37C2CB,
+  brightness: dark)`** as the base (the mockup is dark-first) + a light
+  variant. An `AppColors` ThemeExtension carries the money semantics. Exact
+  values come from `BMONI.dc.html`'s tokens.
+- **`AppColors` (ThemeExtension)** with the semantic colors M3 doesn't
+  cover: `positive` (USD received), `negative`/`fee`, `warning` (quote
+  about to expire). Resolved per theme brightness; widgets read
+  `Theme.of(context).extension<AppColors>()`, never raw hex.
+- **`ThemeMode`**: defaults to `system` (follows the OS) + a manual toggle
+  via a Riverpod provider (`themeModeProvider`).
+- Both themes must look correct; the expiry countdown uses `warning`, the
+  USD received uses `positive`.
 
 ---
 
-## Criterios de aceptación
-- **CA-F1:** Cambiar el locale (es↔en) traduce todo el texto visible; no queda ningún string hardcodeado.
-- **CA-F2:** Agregar un locale nuevo requiere solo un archivo de traducción (sin tocar widgets).
-- **CA-F3:** En tema oscuro, todos los colores (incl. semánticos de dinero) se resuelven legibles;
-  el toggle cambia el tema en runtime y `system` sigue al SO.
-- **CA-F4:** `AppMoneyText` formatea MXN (`$1,000.00` es_MX) y USD (en_US) vía `intl`, no a mano.
-- **CA-F5:** Los mensajes de error del BE se muestran traducidos por `code`, nunca el `message` crudo.
+## Acceptance criteria
+- **CA-F1:** Switching locale (es↔en) translates all visible text; no
+  string is left hardcoded.
+- **CA-F2:** Adding a new locale requires only a translation file (no
+  widget changes).
+- **CA-F3:** In dark theme, every color (including money semantics)
+  resolves legibly; the toggle switches theme at runtime and `system`
+  follows the OS.
+- **CA-F4:** `AppMoneyText` formats MXN (`$1,000.00` es_MX) and USD
+  (en_US) via `intl`, never by hand.
+- **CA-F5:** Backend error messages are shown translated by `code`, never
+  the raw `message`.
 
-## Backlog / iteración futura
-- Localización a idiomas de Nigeria (Nigerian Pidgin `pcm`, Yoruba `yo`, Hausa `ha`, Igbo `ig`):
-  solo agregar los archivos de traducción; la infra ya lo soporta. Relevante para el corredor real de BMONI.
-- Componentes DS adicionales si crecen las pantallas.
+## Backlog / future iteration
+- Localization into Nigerian languages (Nigerian Pidgin `pcm`, Yoruba `yo`,
+  Hausa `ha`, Igbo `ig`): just add the translation files; the infra already
+  supports it. Relevant to BMONI's real corridor.
+- Additional DS components if the screens grow.

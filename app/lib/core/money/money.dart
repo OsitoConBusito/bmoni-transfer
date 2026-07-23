@@ -14,4 +14,13 @@ abstract class Money with _$Money {
   }) = _Money;
 
   double get major => minorUnits / currency.minorPerMajor;
+
+  /// Subtracts same-currency money in integer minor units — no floats. Mixing
+  /// currencies is a programming error, not an expected failure path.
+  Money minus(Money other) {
+    if (currency != other.currency) {
+      throw ArgumentError('Cannot subtract ${other.currency} from $currency');
+    }
+    return Money(minorUnits: minorUnits - other.minorUnits, currency: currency);
+  }
 }

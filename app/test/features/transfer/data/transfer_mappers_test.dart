@@ -14,8 +14,15 @@ void main() {
         quoteId: 'q1',
         sourceAmount: MoneyDto(minorUnits: 100000, currency: 'MXN'),
         fee: MoneyDto(minorUnits: 2000, currency: 'MXN'),
+        feeBreakdown: FeeBreakdownDto(
+          fixed: MoneyDto(minorUnits: 2000, currency: 'MXN'),
+          variable: MoneyDto(minorUnits: 0, currency: 'MXN'),
+          threshold: MoneyDto(minorUnits: 500000, currency: 'MXN'),
+          percentBasisPoints: 100,
+        ),
         destAmount: MoneyDto(minorUnits: 5624, currency: 'USD'),
         rate: RateDto(value: '0.05739', source: 'stub', asOf: '2026-07-22'),
+        createdAt: '2026-07-22T19:00:00.000Z',
         expiresAt: '2026-07-22T19:01:00.000Z',
       );
 
@@ -27,6 +34,9 @@ void main() {
       expect(quote.destAmount.minorUnits, 5624);
       expect(quote.destAmount.currency, Currency.usd);
       expect(quote.rate.value, '0.05739');
+      expect(quote.feeBreakdown.fixed.minorUnits, 2000);
+      expect(quote.feeBreakdown.percentBasisPoints, 100);
+      expect(quote.feeBreakdown.hasVariable, isFalse);
     });
 
     test('given a TransferDto, when toDomain, then maps the status enum', () {
@@ -37,6 +47,7 @@ void main() {
         sourceAmount: MoneyDto(minorUnits: 100000, currency: 'MXN'),
         destAmount: MoneyDto(minorUnits: 5624, currency: 'USD'),
         fee: MoneyDto(minorUnits: 2000, currency: 'MXN'),
+        rate: RateDto(value: '0.05739', source: 'stub', asOf: '2026-07-22'),
         createdAt: '2026-07-22T19:00:30.000Z',
       );
 

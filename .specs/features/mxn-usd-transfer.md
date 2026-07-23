@@ -1,209 +1,238 @@
-# Spec: mxn-usd-transfer — quote y confirmación de transferencia MXN → USD
+# Spec: mxn-usd-transfer — MXN → USD transfer quote and confirmation
 
-> Estado: DRAFT
-> Última revisión: 2026-07-22
-> Contexto: take-home de BMONI (slice vertical, 2-3h). El spec es el contrato:
-> si el código lo contradice, se corrige el spec primero, luego el código.
-
----
-
-## Objetivo
-
-Permitir a un usuario en México cotizar y confirmar una transferencia **MXN → USD**:
-teclea un monto en MXN, ve en vivo el equivalente en USD, el tipo de cambio y el fee,
-revisa un desglose y confirma. El backend provee el rate y registra la transferencia
-de forma **retry-safe** (llamar dos veces no crea dos transferencias).
+> Status: DRAFT
+> Last reviewed: 2026-07-22
+> Context: BMONI take-home (vertical slice, 2-3h). The spec is the contract:
+> if the code contradicts it, fix the spec first, then the code.
 
 ---
 
-## Fuera de alcance (no gastar tiempo)
+## Goal
 
-Auth, pagos reales, KYC real, base de datos, y diseño pixel-perfect. Storage en memoria.
-Solo la dirección MXN → USD (no USD → MXN). Un solo par de divisas.
-
----
-
-## Las dos cosas que este dominio castiga (foco de la evaluación)
-
-1. **Representación de dinero:** cómo se guarda y redondea MXN/USD. → ver § Modelo de dinero.
-2. **Transferencia retry-safe:** `POST /transfers` dos veces no debe doble-cobrar. → ver § Idempotencia.
+Let a user in Mexico quote and confirm an **MXN → USD** transfer: type an
+amount in MXN, see the USD equivalent, the exchange rate and the fee live,
+review a breakdown, and confirm. The backend provides the rate and records
+the transfer in a **retry-safe** way (calling it twice doesn't create two
+transfers).
 
 ---
 
-## Arquitectura
+## Out of scope (don't spend time here)
 
-Principio: arquitectura **intencional pero calibrada al slice** — capas reales, cero ceremonia.
-El acoplamiento va hacia adentro (infra → application → domain); domain no conoce Express, HTTP
-ni Flutter. Errores como valor con un `Result<T,E>` propio (hand-rolled, sin dependencia) en ambos
-lados; `try/catch` solo en el borde. Ver reglas en [/CLAUDE.md](../../CLAUDE.md).
+Auth, real payments, real KYC, a database, and pixel-perfect design.
+In-memory storage. Only the MXN → USD direction (not USD → MXN). A single
+currency pair.
+
+---
+
+## The two things this domain punishes (the evaluation's focus)
+
+1. **Money representation:** how MXN/USD is stored and rounded. → see § Money model.
+2. **Retry-safe transfer:** calling `POST /transfers` twice must not double-charge. → see § Idempotency.
+
+---
+
+## Architecture
+
+Principle: **intentional but calibrated to the slice** architecture — real
+layers, zero ceremony. Coupling points inward (infra → application →
+domain); domain knows nothing about Express, HTTP, or Flutter. Errors as
+values with a custom `Result<T,E>` (hand-rolled, no dependency) on both
+sides; `try/catch` only at the boundary. See rules in
+[/CLAUDE.md](../../CLAUDE.md).
 
 ### Backend — Hexagonal-light (ports & adapters)
 ```
 backend/src/
 ├── domain/            money, rate, quote, transfer, fee; ports/ (RateProvider, Repository, Clock)
-├── application/       get-quote.use-case, create-transfer.use-case  (devuelven Result)
+├── application/       get-quote.use-case, create-transfer.use-case  (return Result)
 ├── infrastructure/    http/ (handlers, router, error-map, pino) · rate/ (frankfurter, stub, cached) · persistence/ (in-memory) · clock/ (system, fake)
 └── shared/            Result, errors, config
 ```
-Los **puertos** (`RateProvider`, `Repository`) hacen swappable el rate (stub↔real) y el storage
-(memoria↔DB) sin tocar el dominio. Handlers finos: parse+Zod → use case → map `Result` a HTTP.
+The **ports** (`RateProvider`, `Repository`) make the rate (stub↔real) and
+storage (in-memory↔DB) swappable without touching the domain. Thin
+handlers: parse+Zod → use case → map `Result` to HTTP.
 
-### Frontend — Clean Arch domain-first, feature-first (una feature `transfer`)
+### Frontend — Clean Arch domain-first, feature-first (one `transfer` feature)
 ```
 app/lib/
 ├── core/                       Money, Result, http client, env/config
 └── features/transfer/
-    ├── domain/        entities (money, quote, transfer) · transfer_repository (iface) · usecases
+    ├── domain/        entities (money, quote, transfer) · transfer_repository (interface) · use cases
     ├── data/          dtos · datasources (http) · mappers · transfer_repository_impl
-    └── presentation/  providers (Riverpod notifiers) · pages (amount_entry, confirmation, result) · widgets (por estado)
+    └── presentation/  providers (Riverpod notifiers) · pages (amount_entry, confirmation, result) · widgets (per state)
 ```
-`domain` no importa `data` ni Flutter. El dinero llega del BE y se mapea a `Money` en `data/`; el
-cliente nunca recalcula el rate. Estado con **Riverpod 3.0 codegen**; `AsyncValue` → loading/error/data.
+`domain` never imports `data` or Flutter. Money comes from the backend and
+gets mapped to `Money` in `data/`; the client never recomputes the rate.
+State via **Riverpod 3.0 codegen**; `AsyncValue` → loading/error/data.
 
 ---
 
-## Modelo de dinero (§ crítica)
+## Money model (§ critical)
 
-Enfoque adoptado de dinero.js/decimal.js, implementado en un value object **propio**
-(sin dependencia externa — decisión: una lib de dinero es over-kill para 2 divisas).
+An approach borrowed from money.js/decimal.js, implemented in a **custom**
+value object (no external dependency — decision: a money library is
+overkill for 2 currencies).
 
-- **Minor units enteros, nunca floats.** MXN se guarda en **centavos** (`int`), USD en
-  **cents** (`int`). El wire (JSON) transporta enteros de minor units, no decimales.
-- **Scale alto durante el cálculo, redondeo una sola vez en el borde.** La multiplicación
-  `MXN * rate` y el `1%` del fee producen fracciones. Se opera con precisión extendida y se
-  **redondea half-up a la unidad mínima destino exactamente una vez**, al materializar el USD.
-  Esto evita el sesgo por doble redondeo.
-- **Modo de redondeo: half-up** (0.5 sube). Documentado y testeado. Aplica al monto USD final
-  y al componente porcentual del fee.
-- **Dirección del redondeo:** el fee y el redondeo nunca favorecen al cliente de forma que
-  descuadre la cuenta; half-up es simétrico y explícito.
+- **Integer minor units, never floats.** MXN is stored in **cents** (`int`),
+  USD in **cents** (`int`). The wire (JSON) carries integer minor units,
+  never decimals.
+- **High scale during computation, rounded once at the boundary.** The
+  `MXN * rate` multiplication and the fee's 1% produce fractions.
+  Computation runs at extended precision and **rounds half-up to the
+  destination's smallest unit exactly once**, when the USD amount is
+  materialized. This avoids double-rounding bias.
+- **Rounding mode: half-up** (0.5 rounds up). Documented and tested.
+  Applies to the final USD amount and the fee's percentage component.
+- **Rounding direction:** the fee and rounding never favor the client in a
+  way that unbalances the books; half-up is symmetric and explicit.
 
-### Fundamento regulatorio (respaldo de la decisión)
-- **Ley Monetaria de los Estados Unidos Mexicanos:** el redondeo a múltiplos de 5 centavos aplica
-  **solo a efectivo**; los pagos que no implican entrega de efectivo se hacen por el **monto exacto**.
-  Una transferencia digital es no-efectivo → operamos en **centavos/cents exactos, sin redondeo a
-  5 centavos**. half-up al mínimo divisible es consistente con "monto exacto".
-- **Tipo de cambio Banxico (FIX):** se publica a **4 decimales**, en dirección USD/MXN (pesos por
-  dólar). Usamos MXN→USD (inverso), que requiere más decimales; guardamos el rate a la precisión de
-  la fuente. Ruta a rate oficial: tomar el FIX como USD/MXN a 4 decimales e invertir. (Hoy: Frankfurter/ECB.)
+### Regulatory basis (backing the decision)
+- **Mexico's Monetary Law:** rounding to multiples of 5 cents applies
+  **only to cash**; payments that don't involve handing over cash are made
+  for the **exact amount**. A digital transfer is non-cash → we operate in
+  **exact cents, no rounding to 5 cents**. Half-up to the smallest
+  divisible unit is consistent with "exact amount".
+- **Banxico exchange rate (FIX):** published at **4 decimals**, in the
+  USD/MXN direction (pesos per dollar). We use MXN→USD (the inverse), which
+  needs more decimals; we store the rate at the source's precision. Path to
+  an official rate: take the FIX as USD/MXN at 4 decimals and invert it.
+  (Today: Frankfurter/ECB.)
 
-### Value object `Money` (ambos lados, espejo conceptual)
-| Prop | Tipo | Nota |
+### `Money` value object (both sides, conceptual mirror)
+| Field | Type | Note |
 |---|---|---|
-| `minorUnits` | `int` | Cantidad en la unidad mínima (centavos MXN / cents USD) |
-| `currency` | `Currency` enum | `MXN` \| `USD` (define el exponente: 2) |
+| `minorUnits` | `int` | Amount in the smallest unit (MXN cents / USD cents) |
+| `currency` | `Currency` enum | `MXN` \| `USD` (defines the exponent: 2) |
 
-Operaciones: `fromMajor(decimal)` (valida entero tras escalar), `toMajor()` (solo display),
-`applyRate(rate, targetCurrency)` (scale alto → round half-up), `plus`/`minus` (misma divisa).
-Prohibido construir `Money` desde un `double` sin pasar por el factory que valida.
+Operations: `fromMajor(decimal)` (validates it's an integer after scaling),
+`toMajor()` (display only), `applyRate(rate, targetCurrency)` (high scale →
+round half-up), `plus`/`minus` (same currency). Building a `Money` from a
+raw `double` without going through the validating factory is forbidden.
 
 ---
 
-## Dominio
+## Domain
 
 ### Enums
-- `Currency { MXN, USD }` — exponente 2 para ambas.
+- `Currency { MXN, USD }` — exponent 2 for both.
 - `TransferStatus { PENDING, COMPLETED, FAILED, EXPIRED }`.
 
-### Entidad `Quote`
-| Campo | Tipo | Nota |
+### `Quote` entity
+| Field | Type | Note |
 |---|---|---|
-| `id` | `string` (uuid) | Generado por el BE |
-| `sourceAmount` | `Money(MXN)` | Monto que teclea el usuario |
-| `rate` | `Rate` | Rate MXN→USD usado (ver § Rate) |
-| `fee` | `Money(MXN)` | Fee escalonado (ver § Fee) |
-| `destAmount` | `Money(USD)` | `(sourceAmount − fee) * rate`, redondeado half-up |
+| `id` | `string` (uuid) | Generated by the backend |
+| `sourceAmount` | `Money(MXN)` | Amount the user types |
+| `rate` | `Rate` | MXN→USD rate used (see § Rate) |
+| `fee` | `Money(MXN)` | Tiered fee (see § Fee) |
+| `destAmount` | `Money(USD)` | `(sourceAmount − fee) * rate`, rounded half-up |
 | `createdAt` | `timestamp` | |
 | `expiresAt` | `timestamp` | `createdAt + 60s` |
 
 Getter: `isExpired(now) => now >= expiresAt`.
 
-### Entidad `Transfer`
-| Campo | Tipo | Nota |
+### `Transfer` entity
+| Field | Type | Note |
 |---|---|---|
 | `id` | `string` (uuid) | |
-| `quoteId` | `string` | La quote que consumió |
-| `sourceAmount` / `destAmount` / `fee` / `rate` | (snapshot) | Copiados de la quote al crear (inmutables) |
+| `quoteId` | `string` | The quote it consumed |
+| `sourceAmount` / `destAmount` / `fee` / `rate` | (snapshot) | Copied from the quote on creation (immutable) |
 | `status` | `TransferStatus` | |
-| `idempotencyKey` | `string` | Key con la que se creó |
+| `idempotencyKey` | `string` | The key it was created with |
 | `createdAt` | `timestamp` | |
 
 ### `Rate` (value object)
-| Campo | Tipo | Nota |
+| Field | Type | Note |
 |---|---|---|
-| `value` | `decimal` (string en wire) | MXN→USD, ej. `0.05739` |
+| `value` | `decimal` (string on the wire) | MXN→USD, e.g. `0.05739` |
 | `source` | `string` | `frankfurter` \| `stub` |
-| `asOf` | `date` | Fecha del rate (ECB da rate diario) |
+| `asOf` | `date` | The rate's date (ECB publishes a daily rate) |
 
 ---
 
-## Reglas de negocio
+## Business rules
 
-### § Rate (el rate NO se hardcodea en el cliente)
-- El backend expone el rate; el cliente **nunca** lo calcula ni lo hardcodea.
-- Fuente detrás de una interfaz `RateProvider`, seleccionable por env `RATE_PROVIDER`:
-  - `FrankfurterRateProvider` (default) → `GET https://api.frankfurter.dev/v1/latest?base=MXN&symbols=USD` (sin API key, rate ECB diario).
-  - `StubRateProvider` → rate fijo determinista (tests y fallback).
-- **Caché en memoria con TTL** del rate: el quote no dispara una llamada de red por request.
-- **Fallback:** si Frankfurter falla y no hay rate cacheado válido → responder `503`
-  con error accionable (no inventar un rate). El frontend trata 503 como "network error" reintentar.
+### § Rate (the rate is NOT hardcoded on the client)
+- The backend exposes the rate; the client **never** computes or hardcodes
+  it.
+- Sourced behind a `RateProvider` interface, selectable via the
+  `RATE_PROVIDER` env var:
+  - `FrankfurterRateProvider` (default) → `GET https://api.frankfurter.dev/v1/latest?base=MXN&symbols=USD` (no API key, daily ECB rate).
+  - `StubRateProvider` → a fixed, deterministic rate (tests and fallback).
+- **In-memory cache with a TTL** for the rate: quoting doesn't trigger a
+  network call on every request.
+- **Fallback:** if Frankfurter fails and there's no valid cached rate →
+  respond `503` with an actionable error (never invent a rate). The
+  frontend treats 503 as a "network error" to retry.
 
-### § Fee escalonado (flat + porcentual)
-Parámetros (defaults; configurables por env):
-- `FEE_FLAT_MXN = 20.00` (2000 centavos)
-- `FEE_THRESHOLD_MXN = 5000.00` (500000 centavos)
+### § Tiered fee (flat + percentage)
+Parameters (defaults; configurable via env):
+- `FEE_FLAT_MXN = 20.00` (2000 cents)
+- `FEE_THRESHOLD_MXN = 5000.00` (500000 cents)
 - `FEE_PERCENT = 0.01` (1%)
 
-Regla:
+Rule:
 ```
 fee = FEE_FLAT
 if sourceAmount > FEE_THRESHOLD:
-    fee += FEE_PERCENT * sourceAmount   (redondeado half-up a centavos)
+    fee += FEE_PERCENT * sourceAmount   (rounded half-up to cents)
 ```
-Ejemplos: 500 MXN→20 · 5 000→20 · 10 000→120 · 50 000→520.
-El `destAmount` se calcula sobre `(sourceAmount − fee)` (el fee se deduce del envío).
+Examples: 500 MXN→20 · 5,000→20 · 10,000→120 · 50,000→520.
+`destAmount` is computed over `(sourceAmount − fee)` (the fee is deducted
+from the send).
 
-### § Límites de monto (validación BE)
-- `MIN_AMOUNT_MXN = 10.00`, `MAX_AMOUNT_MXN = 100 000.00`.
-- Fuera de rango, cero, negativo, no-numérico, o `sourceAmount ≤ fee` → `400` con código accionable.
+### § Amount limits (backend validation)
+- `MIN_AMOUNT_MXN = 10.00`, `MAX_AMOUNT_MXN = 100,000.00`.
+- Out of range, zero, negative, non-numeric, or `sourceAmount ≤ fee` →
+  `400` with an actionable code.
 
-### § Expiración de quote y determinismo
-- TTL = **60s**. `POST /transfers` con una quote expirada → `409 QUOTE_EXPIRED`.
-- **Puerto `Clock`** (`now()`) inyectado en vez de `Date.now()` inline: el dominio no toca el reloj
-  global. `SystemClock` en prod, `FakeClock` en tests → la expiración se prueba de forma determinista
-  sin esperas reales. (Costura que suele faltar cuando se usa `Date.now()` directo.)
-- **Caché de rate:** TTL propio (`RATE_CACHE_TTL_MS`, default 60s) sobre el `Clock`. El quote no
-  dispara una llamada de red por request; en cold start la primera request llena la caché.
-
----
-
-## Idempotencia (defensa en profundidad — § crítica)
-
-Tres capas para que `POST /transfers` no doble-cobre:
-
-1. **Quote single-use (clave natural):** cada `quoteId` se consume una vez. Un segundo POST
-   con la misma quote (misma idempotency key) devuelve el **mismo** `Transfer` ya creado, `200`.
-   Un POST con la misma quote pero **distinta** idempotency key → `409 QUOTE_ALREADY_USED`.
-2. **`Idempotency-Key` header (patrón Stripe):** el cliente genera un UUID por intento lógico.
-   El BE guarda `key → transferId`. Reintento con la misma key → devuelve el mismo transfer (`200`),
-   sin crear otro. Key ausente en `POST /transfers` → `400 IDEMPOTENCY_KEY_REQUIRED`.
-3. **Barrera de control en Flutter:** guard de doble-submit (botón deshabilitado + flag
-   `isSubmitting` en el notifier) para que un doble-tap no dispare dos requests siquiera.
-
-Reglas de conflicto:
-- Misma `Idempotency-Key` + mismo `quoteId` → idempotente, `200` con el transfer existente.
-- Misma `Idempotency-Key` + `quoteId` distinto → `409 IDEMPOTENCY_KEY_REUSED` (uso indebido).
+### § Quote expiry and determinism
+- TTL = **60s**. `POST /transfers` with an expired quote → `409 QUOTE_EXPIRED`.
+- **Injected `Clock` port** (`now()`) instead of inline `Date.now()`: the
+  domain never touches the global clock. `SystemClock` in prod, `FakeClock`
+  in tests → expiry is tested deterministically, with no real waits. (A
+  seam that's usually missing when `Date.now()` is used directly.)
+- **Rate cache:** its own TTL (`RATE_CACHE_TTL_MS`, default 60s) over the
+  `Clock`. Quoting doesn't trigger a network call per request; on cold
+  start, the first request fills the cache.
 
 ---
 
-## Contrato de la API
+## Idempotency (defense in depth — § critical)
 
-Base path: **`/api/v1`** (versionado). Todos los paths de abajo cuelgan de ahí
-(ej. `GET /api/v1/quote`). Además `GET /health` → `200 { status: "ok" }` (sin versionar).
-CORS habilitado (permite correr el Flutter en web). Logger estructurado **pino** (nunca `console.log`).
+Three layers so `POST /transfers` never double-charges:
+
+1. **Single-use quote (natural key):** each `quoteId` is consumed once. A
+   second POST with the same quote (same idempotency key) returns the
+   **same** already-created `Transfer`, `200`. A POST with the same quote
+   but a **different** idempotency key → `409 QUOTE_ALREADY_USED`.
+2. **`Idempotency-Key` header (Stripe pattern):** the client generates a
+   UUID per logical attempt. The backend stores `key → transferId`. A
+   retry with the same key → returns the same transfer (`200`), without
+   creating another. Missing key on `POST /transfers` →
+   `400 IDEMPOTENCY_KEY_REQUIRED`.
+3. **Control barrier in Flutter:** a double-submit guard (disabled button +
+   an `isSubmitting` flag on the notifier) so a double-tap doesn't even
+   fire two requests.
+
+Conflict rules:
+- Same `Idempotency-Key` + same `quoteId` → idempotent, `200` with the
+  existing transfer.
+- Same `Idempotency-Key` + different `quoteId` → `409 IDEMPOTENCY_KEY_REUSED`
+  (key misuse).
+
+---
+
+## API contract
+
+Base path: **`/api/v1`** (versioned). Every path below hangs off it (e.g.
+`GET /api/v1/quote`). Plus `GET /health` → `200 { status: "ok" }`
+(unversioned). CORS enabled (lets Flutter run on web). Structured **pino**
+logger (never `console.log`).
 
 ### `GET /quote?amount=<MXN major>`
-`amount` en unidades mayores (ej. `1000.50`). El BE lo escala a centavos y valida.
+`amount` in major units (e.g. `1000.50`). The backend scales it to cents
+and validates it.
 
 **200:**
 ```json
@@ -211,25 +240,47 @@ CORS habilitado (permite correr el Flutter en web). Logger estructurado **pino**
   "quoteId": "uuid",
   "sourceAmount": { "minorUnits": 100050, "currency": "MXN" },
   "fee":          { "minorUnits": 2000,   "currency": "MXN" },
+  "feeBreakdown": {
+    "fixed":    { "minorUnits": 2000,   "currency": "MXN" },
+    "variable": { "minorUnits": 0,      "currency": "MXN" },
+    "threshold":{ "minorUnits": 500000, "currency": "MXN" },
+    "percentBasisPoints": 100
+  },
   "destAmount":   { "minorUnits": 5624,   "currency": "USD" },
   "rate": { "value": "0.05739", "source": "frankfurter", "asOf": "2026-07-22" },
+  "createdAt": "2026-07-22T19:00:00Z",
   "expiresAt": "2026-07-22T19:00:60Z"
 }
 ```
-**Errores:** `400` (`AMOUNT_REQUIRED`, `AMOUNT_NOT_NUMERIC`, `AMOUNT_TOO_LOW`, `AMOUNT_TOO_HIGH`,
-`AMOUNT_NOT_POSITIVE`, `AMOUNT_BELOW_FEE`), `503 RATE_UNAVAILABLE`.
-`AMOUNT_BELOW_FEE`: el monto no cubre el fee (`sourceAmount ≤ fee`) — posible porque el mínimo
-(10 MXN) es menor que el fee flat (20 MXN); sin esto el `destAmount` sería negativo.
+
+`createdAt` lets the client compute the quote's real TTL (`expiresAt −
+createdAt`) instead of assuming a fixed value — needed for a correct
+countdown if the confirmation screen remounts with the same quote (e.g.
+the user goes back and forward again without re-quoting).
+`feeBreakdown` explains how the fee was composed, so the client can
+display it **without hardcoding the policy**: `fixed` (the flat part) +
+`variable` (the percentage part, `0` below the threshold), plus the rule
+(`threshold`, `percentBasisPoints`). The total `fee` = `fixed + variable`.
+The percentage is applied to the full amount above the threshold (see §
+Tiered fee). The client never recomputes: it only presents these values.
+
+**Errors:** `400` (`AMOUNT_REQUIRED`, `AMOUNT_NOT_NUMERIC`,
+`AMOUNT_TOO_LOW`, `AMOUNT_TOO_HIGH`, `AMOUNT_NOT_POSITIVE`,
+`AMOUNT_BELOW_FEE`), `503 RATE_UNAVAILABLE`.
+`AMOUNT_BELOW_FEE`: the amount doesn't cover the fee (`sourceAmount ≤ fee`)
+— possible because the minimum (10 MXN) is lower than the flat fee
+(20 MXN); without this, `destAmount` would be negative.
 
 ### `POST /transfers`
-Headers: `Idempotency-Key: <uuid>` (requerido).
+Headers: `Idempotency-Key: <uuid>` (required).
 ```json
 { "quoteId": "uuid" }
 ```
-El body **solo** lleva `quoteId`. El BE recupera la quote guardada, verifica expiración, y
-**recalcula/usa sus propios** valores de rate/USD/fee. Nunca confía en dinero enviado por el cliente.
+The body carries **only** `quoteId`. The backend retrieves the stored
+quote, checks expiry, and **recalculates/uses its own** rate/USD/fee
+values. It never trusts money sent by the client.
 
-**201** (creado) / **200** (reintento idempotente):
+**201** (created) / **200** (idempotent retry):
 ```json
 {
   "transferId": "uuid",
@@ -238,102 +289,138 @@ El body **solo** lleva `quoteId`. El BE recupera la quote guardada, verifica exp
   "sourceAmount": { "minorUnits": 100050, "currency": "MXN" },
   "destAmount":   { "minorUnits": 5624,   "currency": "USD" },
   "fee":          { "minorUnits": 2000,   "currency": "MXN" },
+  "rate": { "value": "0.05739", "source": "frankfurter", "asOf": "2026-07-22" },
   "createdAt": "2026-07-22T19:00:30Z"
 }
 ```
-**Errores:** `400` (`IDEMPOTENCY_KEY_REQUIRED`, `QUOTE_ID_REQUIRED`), `404 QUOTE_NOT_FOUND`,
-`409` (`QUOTE_EXPIRED`, `QUOTE_ALREADY_USED`, `IDEMPOTENCY_KEY_REUSED`, `QUOTE_TAMPERED`).
-`QUOTE_TAMPERED`: la firma HMAC de la quote guardada no verifica (integridad; ver security.md CA-S2).
+**Errors:** `400` (`IDEMPOTENCY_KEY_REQUIRED`, `QUOTE_ID_REQUIRED`),
+`404 QUOTE_NOT_FOUND`, `409` (`QUOTE_EXPIRED`, `QUOTE_ALREADY_USED`,
+`IDEMPOTENCY_KEY_REUSED`, `QUOTE_TAMPERED`).
+`QUOTE_TAMPERED`: the stored quote's HMAC signature doesn't verify
+(integrity; see security.md CA-S2).
 
-### Envelope de error (consistente)
+### Error envelope (consistent)
 ```json
 { "error": { "code": "AMOUNT_TOO_HIGH", "message": "Amount 150000 MXN exceeds max 100000 MXN", "field": "amount" } }
 ```
 
 ---
 
-## Estado del backend (in-memory)
-- `Map<quoteId, Quote>`, `Map<transferId, Transfer>`, `Map<idempotencyKey, transferId>`,
-  `Set<usedQuoteId>`. Sin DB. La caché de rate es un objeto `{ rate, cachedAt }` con TTL.
+## Backend state (in-memory)
+- `Map<quoteId, Quote>`, `Map<transferId, Transfer>`,
+  `Map<idempotencyKey, transferId>`, `Set<usedQuoteId>`. No DB. The rate
+  cache is a `{ rate, cachedAt }` object with a TTL.
 
 ---
 
-## Frontend — estados y flujo
+## Frontend — states and flow
 
-Pantallas: **AmountEntry** → **Confirmation** → **Result**.
+Screens: **AmountEntry** → **Confirmation** → **Result**.
 
 ### AmountEntry
-- Input MXN numérico; al teclear con **debounce ~400ms** llama `GET /quote` → muestra USD, rate, fee
-  en vivo. Cada request cancela la anterior (evita respuestas fuera de orden).
-- **Formato de dinero con `intl`:** MXN en locale `es_MX` (`$1,000.00`), USD en `en_US`. Nunca
-  concatenar strings de dinero a mano; el display sale de `Money.toMajor()` formateado por `intl`.
-- Estados: `idle` · `loading` (cotizando) · `data` (quote válida) · `error`
-  (network/`RATE_UNAVAILABLE` → reintentar) · `invalid` (0/negativo/fuera de rango → mensaje inline).
+- Numeric MXN input; typing with a **~400ms debounce** calls `GET /quote`
+  → shows USD, rate, fee live. Each request cancels the previous one
+  (avoids out-of-order replies).
+- **Money formatting with `intl`:** MXN in the `es_MX` locale
+  (`$1,000.00`), USD in `en_US`. Never hand-concatenate money strings; the
+  display comes from `Money.toMajor()` formatted by `intl`.
+- States: `idle` · `loading` (quoting) · `data` (valid quote) · `error`
+  (network/`RATE_UNAVAILABLE` → retry) · `invalid` (0/negative/out of
+  range → inline message).
 
 ### Confirmation
-- Desglose claro: envías X MXN · fee · rate · recibe Y USD · expira en NN s (countdown).
-- Si la quote expira antes de confirmar → estado **expired** con CTA "Volver a cotizar".
-- Confirmar → guard de doble-submit → `POST /transfers` con `Idempotency-Key` generada al entrar
-  a la confirmación (estable ante reintentos del mismo intento lógico).
+- A clear breakdown: sending X MXN · fee · rate · receiving Y USD ·
+  expires in NN s (countdown).
+- If the quote expires before confirming → **expired** state with a
+  "Get a new quote" CTA.
+- Confirm → double-submit guard → `POST /transfers` with an
+  `Idempotency-Key` generated on entering confirmation (stable across
+  retries of the same logical attempt).
 
 ### Result
-- `success` (status COMPLETED/PENDING) con resumen · `failure` (network/409 expired/FAILED)
-  con causa accionable y reintento.
+- `success` (status COMPLETED/PENDING) with a summary · `failure`
+  (network/409 expired/FAILED) with an actionable cause and a retry.
 
 ### State management
-- **Riverpod 3.0 con code generation** (`@riverpod`). `AsyncValue` mapea directo a loading/error/data.
-- Notifier de quote (debounce + cancelación de la request anterior) y notifier de transfer
-  (con `isSubmitting` para la barrera de doble-submit). Providers testeables con overrides.
+- **Riverpod 3.0 with code generation** (`@riverpod`). `AsyncValue` maps
+  directly to loading/error/data.
+- A quote notifier (debounce + cancelling the previous request) and a
+  transfer notifier (with `isSubmitting` for the double-submit barrier).
+  Providers are testable via overrides.
 
 ---
 
-## Criterios de aceptación
+## Acceptance criteria
 
 ### Backend — quote
-- **CA-1:** `GET /quote?amount=1000` → 200 con `destAmount` = `(1000 − fee) * rate` en cents USD, half-up.
-- **CA-2:** `amount=5000` → fee 20 MXN; `amount=10000` → fee 120 MXN (flat + 1%).
-- **CA-3:** `amount=0` / negativo / no numérico → 400 con el código correspondiente.
-- **CA-4:** `amount=5` (< min) → 400 `AMOUNT_TOO_LOW`; `amount=150000` → 400 `AMOUNT_TOO_HIGH`.
-- **CA-5:** El rate proviene del `RateProvider` (no hardcodeado); con `RATE_PROVIDER=stub` es determinista.
-- **CA-6:** Provider real caído y sin caché → 503 `RATE_UNAVAILABLE` (no inventa rate).
+- **CA-1:** `GET /quote?amount=1000` → 200 with `destAmount` =
+  `(1000 − fee) * rate` in USD cents, half-up.
+- **CA-2:** `amount=5000` → 20 MXN fee; `amount=10000` → 120 MXN fee
+  (flat + 1%).
+- **CA-3:** `amount=0` / negative / non-numeric → 400 with the matching
+  code.
+- **CA-4:** `amount=5` (< min) → 400 `AMOUNT_TOO_LOW`; `amount=150000` →
+  400 `AMOUNT_TOO_HIGH`.
+- **CA-5:** The rate comes from the `RateProvider` (never hardcoded); with
+  `RATE_PROVIDER=stub` it's deterministic.
+- **CA-6:** Real provider down and no cache → 503 `RATE_UNAVAILABLE` (never
+  invents a rate).
 
-### Backend — transfer / idempotencia
-- **CA-7:** `POST /transfers` con quote válida + key → 201 con status y snapshot de montos.
-- **CA-8 (retry-safe):** dos POST idénticos (misma key, mismo quoteId) → un solo Transfer; el 2º
-  devuelve 200 con el mismo `transferId`. **Nunca** se crean dos.
-- **CA-9:** POST con quote expirada → 409 `QUOTE_EXPIRED`.
-- **CA-10:** POST sin `Idempotency-Key` → 400 `IDEMPOTENCY_KEY_REQUIRED`.
-- **CA-11:** Misma key con `quoteId` distinto → 409 `IDEMPOTENCY_KEY_REUSED`.
-- **CA-12:** El body con rate/fee/USD manipulados se ignora; el BE usa los valores de la quote.
-- **CA-13:** `quoteId` inexistente → 404 `QUOTE_NOT_FOUND`.
+### Backend — transfer / idempotency
+- **CA-7:** `POST /transfers` with a valid quote + key → 201 with status
+  and a money snapshot.
+- **CA-8 (retry-safe):** two identical POSTs (same key, same quoteId) → a
+  single Transfer; the 2nd returns 200 with the same `transferId`.
+  **Never** creates two.
+- **CA-9:** POST with an expired quote → 409 `QUOTE_EXPIRED`.
+- **CA-10:** POST without `Idempotency-Key` → 400
+  `IDEMPOTENCY_KEY_REQUIRED`.
+- **CA-11:** Same key with a different `quoteId` → 409
+  `IDEMPOTENCY_KEY_REUSED`.
+- **CA-12:** A body with tampered rate/fee/USD is ignored; the backend
+  uses the quote's own values.
+- **CA-13:** Unknown `quoteId` → 404 `QUOTE_NOT_FOUND`.
 
 ### Money
-- **CA-14:** Ninguna operación de dinero usa `float`/`double` directo; todo pasa por `Money`.
-- **CA-15:** Doble redondeo evitado: `(amount−fee)*rate` se redondea half-up **una sola vez**.
+- **CA-14:** No money operation ever uses a raw `float`/`double`;
+  everything goes through `Money`.
+- **CA-15:** Double rounding avoided: `(amount−fee)*rate` is rounded
+  half-up **exactly once**.
 
 ### Frontend
-- **CA-16:** Al teclear un monto válido (debounce), se ve USD/rate/fee de la quote en vivo.
-- **CA-17:** Monto 0/negativo/fuera de rango → mensaje inline, sin llamar al BE innecesariamente.
-- **CA-18:** Error de red al cotizar → estado error con reintento.
-- **CA-19:** Quote expirada en Confirmation → estado expired con "Volver a cotizar".
-- **CA-20:** Doble-tap en Confirmar → una sola llamada a `POST /transfers` (barrera de control).
+- **CA-16:** Typing a valid amount (debounced) shows the live quote's
+  USD/rate/fee.
+- **CA-17:** Amount 0/negative/out of range → inline message, without
+  unnecessarily calling the backend.
+- **CA-18:** Network error while quoting → error state with a retry.
+- **CA-19:** Expired quote in Confirmation → expired state with
+  "Get a new quote".
+- **CA-20:** Double-tap on Confirm → a single call to `POST /transfers`
+  (control barrier).
 
 ---
 
-## Estrategia de tests (presupuesto concentrado donde el dominio castiga)
+## Test strategy (budget concentrated where the domain punishes)
 
-No cobertura pareja; foco en las dos cosas evaluadas + los caminos de fallo.
-- **Backend (Vitest):** `Money` VO exhaustivo (half-up, sin doble redondeo, rechazo de floats) ·
-  fee escalonado (los ejemplos de CA-2) · idempotencia (CA-8: dos POST = un transfer; CA-9/10/11) ·
-  use cases con `FakeClock` + `StubRateProvider` (expiración determinista) · un puñado de tests de
-  integración de los endpoints (supertest) para el contrato HTTP.
-- **Frontend (flutter_test + mocktail):** widget/notifier tests de los estados que el spec exige
-  (CA-17 inválido, CA-19 expirada, CA-20 doble-submit) + mapeo DTO→`Money`.
-- Trazabilidad: anotar `// CA-N` en los tests para cerrar spec→test.
+Not even coverage; focus on the two things being evaluated plus the
+failure paths.
+- **Backend (Vitest):** exhaustive `Money` VO (half-up, no double
+  rounding, float rejection) · tiered fee (the CA-2 examples) ·
+  idempotency (CA-8: two POSTs = one transfer; CA-9/10/11) · use cases
+  with `FakeClock` + `StubRateProvider` (deterministic expiry) · a handful
+  of endpoint integration tests (supertest) for the HTTP contract.
+- **Frontend (flutter_test + mocktail):** widget/notifier tests for the
+  states the spec requires (CA-17 invalid, CA-19 expired, CA-20
+  double-submit) + DTO→`Money` mapping.
+- Traceability: annotate `// CA-N` in tests to close the loop from spec to
+  test.
 
-## Backlog / iteración futura (fuera del scope 2-3h)
-- **`contract-checker` agent (BE↔FE):** verificar que el contrato de la API (códigos de error,
-  shapes de DTO, envelope) no driftee entre el backend TS y el cliente Flutter. Ideal cuando el
-  contrato crezca; hoy es un solo par de endpoints y se mantiene a mano contra este spec.
-- Persistencia real (DB) + más pares de divisas + selección de dirección USD↔MXN.
-- Webhook/estado asíncrono real del transfer (hoy PENDING→COMPLETED es inmediato).
+## Backlog / future iteration (out of the 2-3h scope)
+- **`contract-checker` agent (BE↔FE):** verify the API contract (error
+  codes, DTO shapes, envelope) doesn't drift between the TS backend and
+  the Flutter client. Ideal once the contract grows; today it's a single
+  pair of endpoints, kept in sync by hand against this spec.
+- Real persistence (a DB) + more currency pairs + choosing the USD↔MXN
+  direction.
+- A real async transfer status/webhook (today PENDING→COMPLETED is
+  immediate).

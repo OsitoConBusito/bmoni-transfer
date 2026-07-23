@@ -2,6 +2,7 @@ import 'package:bmoni_transfer/core/error/failure.dart';
 import 'package:bmoni_transfer/core/money/currency.dart';
 import 'package:bmoni_transfer/core/money/money.dart';
 import 'package:bmoni_transfer/core/result/result.dart';
+import 'package:bmoni_transfer/features/transfer/domain/entities/rate.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/transfer.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/transfer_status.dart';
 import 'package:bmoni_transfer/features/transfer/domain/transfer_repository.dart';
@@ -19,6 +20,7 @@ final _transfer = Transfer(
   sourceAmount: const Money(minorUnits: 100000, currency: Currency.mxn),
   destAmount: const Money(minorUnits: 5624, currency: Currency.usd),
   fee: const Money(minorUnits: 2000, currency: Currency.mxn),
+  rate: const Rate(value: '0.05739', source: 'stub', asOf: '2026-07-22'),
   createdAt: DateTime.utc(2026, 7, 22, 19),
 );
 

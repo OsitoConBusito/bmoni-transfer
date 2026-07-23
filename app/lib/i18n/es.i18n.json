@@ -3,27 +3,42 @@
   "tagline": "Envía dinero de México a Estados Unidos",
   "amountEntry": {
     "title": "Enviar dinero",
+    "recipientTo": "Para",
+    "recipientAccount": "Cuenta ···· 4821",
+    "recipientChange": "Cambiar",
+    "heroLabel": "TÚ ENVÍAS · MXN",
     "amountLabel": "Envías (MXN)",
     "amountHint": "0.00",
     "youReceive": "El destinatario recibe",
     "rate": "Tipo de cambio",
     "fee": "Comisión",
+    "emptyHint": "Escribe un monto para ver cuánto recibe en dólares.",
     "continueCta": "Continuar"
   },
   "confirmation": {
-    "title": "Confirmar transferencia",
+    "title": "Confirma tu envío",
+    "heroLabel": "VAS A ENVIAR",
     "youSend": "Envías",
     "fee": "Comisión",
+    "converted": "Se convierten",
     "rate": "Tipo de cambio",
     "youReceive": "El destinatario recibe",
+    "rateHold": "Este tipo de cambio se mantiene por",
     "expiresIn": "La cotización expira en {seconds}s",
-    "expiredTitle": "Esta cotización expiró",
+    "expiredTitle": "La cotización expiró",
+    "expiredBody": "El tipo de cambio pudo haber cambiado — vuelve a cotizar para continuar.",
     "backToQuote": "Volver a cotizar",
-    "confirmCta": "Confirmar y enviar"
+    "confirmCta": "Confirmar y enviar",
+    "sending": "Enviando…"
   },
   "result": {
-    "successTitle": "Transferencia completada",
-    "successBody": "{amount} va en camino.",
+    "sentTitle": "¡Enviado!",
+    "recipientWillReceive": "El destinatario recibirá",
+    "availableIn": "Disponible en ~2 minutos",
+    "reference": "Folio",
+    "youSent": "Enviaste",
+    "date": "Fecha",
+    "sendAnother": "Enviar otro",
     "failureTitle": "La transferencia falló",
     "retryCta": "Reintentar",
     "doneCta": "Listo"
@@ -38,6 +53,10 @@
     "amountBelowFee": "El monto debe ser mayor a la comisión.",
     "quoteExpired": "Esta cotización expiró. Solicita una nueva.",
     "unexpected": "Algo salió mal. Intenta de nuevo."
+  },
+  "feeInfo": {
+    "fixedOnly": "Tarifa fija de {fixed}.",
+    "combined": "{fixed} fija + {percent}% ({variable}) por superar {threshold}."
   },
   "common": {
     "retry": "Reintentar",

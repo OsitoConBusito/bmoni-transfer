@@ -6,7 +6,14 @@ export const toQuoteResponse = (quote: Quote) => ({
   quoteId: quote.id,
   sourceAmount: moneyDto(quote.sourceAmount),
   fee: moneyDto(quote.fee),
+  feeBreakdown: {
+    fixed: moneyDto(quote.feeBreakdown.fixed),
+    variable: moneyDto(quote.feeBreakdown.variable),
+    threshold: moneyDto(quote.feeBreakdown.threshold),
+    percentBasisPoints: quote.feeBreakdown.percentBasisPoints,
+  },
   destAmount: moneyDto(quote.destAmount),
   rate: { value: quote.rate.value, source: quote.rate.source, asOf: quote.rate.asOf },
+  createdAt: new Date(quote.createdAt).toISOString(),
   expiresAt: new Date(quote.expiresAt).toISOString(),
 });
