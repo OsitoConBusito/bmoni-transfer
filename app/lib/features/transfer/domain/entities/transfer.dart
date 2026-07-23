@@ -1,4 +1,5 @@
 import 'package:bmoni_transfer/core/money/money.dart';
+import 'package:bmoni_transfer/features/transfer/domain/entities/rate.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/transfer_status.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -12,6 +13,7 @@ abstract class Transfer with _$Transfer {
     required Money sourceAmount,
     required Money destAmount,
     required Money fee,
+    required Rate rate,
     required DateTime createdAt,
   }) = _Transfer;
 }

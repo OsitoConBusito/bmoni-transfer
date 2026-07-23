@@ -16,6 +16,7 @@ import 'package:bmoni_transfer/shared/router/app_router.dart';
 import 'package:bmoni_transfer/shared/theme/app_colors.dart';
 import 'package:bmoni_transfer/shared/theme/app_typography.dart';
 import 'package:bmoni_transfer/shared/utils/currency_input_formatter.dart';
+import 'package:bmoni_transfer/shared/utils/end_cursor_text_controller.dart';
 import 'package:bmoni_transfer/shared/utils/money_formatting.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,8 +24,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
-/// The amount is the hero: a large centered field drives a live quote below it.
-/// The CTA stays pinned at the bottom, enabled only once a quote exists.
 class AmountEntryPage extends ConsumerStatefulWidget {
   const AmountEntryPage({super.key});
 
@@ -33,8 +32,26 @@ class AmountEntryPage extends ConsumerStatefulWidget {
 }
 
 class _AmountEntryPageState extends ConsumerState<AmountEntryPage> {
-  final _controller = TextEditingController();
+  final _controller = EndCursorTextEditingController();
   final _formatter = const CurrencyInputFormatter(Currency.mxn);
+
+  @override
+  void initState() {
+    super.initState();
+    // quoteProvider outlives this widget (it's a Riverpod provider, not
+    // widget state): if this instance mounts while a quote already exists —
+    // e.g. returning here and the widget happens to get recreated — the
+    // field must show the amount that produced it, not start blank while the
+    // quote card below still shows stale-looking data for "no amount".
+    final asyncQuote = ref.read(quoteProvider);
+    final quote = switch (asyncQuote) {
+      AsyncData(:final value) => value,
+      _ => null,
+    };
+    if (quote != null) {
+      _controller.text = quote.sourceAmount.format(withCode: false);
+    }
+  }
 
   @override
   void dispose() {
@@ -65,8 +82,7 @@ class _AmountEntryPageState extends ConsumerState<AmountEntryPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Scrolls so the keyboard never overflows the fixed content; the
-              // CTA below stays pinned above the keyboard.
+              // Scrolls so the keyboard can't overflow this content.
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -89,9 +105,17 @@ class _AmountEntryPageState extends ConsumerState<AmountEntryPage> {
                         error: (error, _) => error is ValidationFailure
                             ? const _QuoteEmpty()
                             : AppErrorState(
+                                // The state's error is only ever a Failure in
+                                // practice (see QuoteNotifier), but this is a
+                                // presentation boundary reading whatever
+                                // AsyncValue.error surfaces — never trust that
+                                // blindly with a force cast; fall back to a
+                                // generic message instead of crashing.
                                 message: failureMessage(
                                   translations,
-                                  error as Failure,
+                                  error is Failure
+                                      ? error
+                                      : const UnexpectedFailure(),
                                 ),
                                 retryLabel: translations.common.retry,
                                 onRetry: () => notifier.onAmountChanged(

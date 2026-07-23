@@ -15,6 +15,7 @@ _QuoteDto _$QuoteDtoFromJson(Map<String, dynamic> json) => _QuoteDto(
   ),
   destAmount: MoneyDto.fromJson(json['destAmount'] as Map<String, dynamic>),
   rate: RateDto.fromJson(json['rate'] as Map<String, dynamic>),
+  createdAt: json['createdAt'] as String,
   expiresAt: json['expiresAt'] as String,
 );
 
@@ -25,6 +26,7 @@ Map<String, dynamic> _$QuoteDtoToJson(_QuoteDto instance) => <String, dynamic>{
   'feeBreakdown': instance.feeBreakdown,
   'destAmount': instance.destAmount,
   'rate': instance.rate,
+  'createdAt': instance.createdAt,
   'expiresAt': instance.expiresAt,
 };
 

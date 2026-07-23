@@ -3,15 +3,14 @@ import 'package:bmoni_transfer/shared/design_system/tokens/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-/// The primary CTA. Sizing, radius and text style come from `FilledButtonTheme`
-/// (see `AppTheme`); this widget only adds the in-place loading barrier. When
-/// `loadingLabel` is set, the spinner sits beside it (e.g. "Sending…").
+// Sizing, radius and text style come from FilledButtonTheme (see AppTheme).
 class AppButton extends StatelessWidget {
   const AppButton({
     required this.label,
     required this.onPressed,
     this.isLoading = false,
     this.loadingLabel,
+    this.icon,
     super.key,
   });
 
@@ -19,12 +18,23 @@ class AppButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
   final String? loadingLabel;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton(
-      onPressed: isLoading ? null : onPressed,
-      child: isLoading ? _LoadingContent(label: loadingLabel) : Text(label),
+    if (isLoading) {
+      return FilledButton(
+        onPressed: null,
+        child: _LoadingContent(label: loadingLabel),
+      );
+    }
+    if (icon == null) {
+      return FilledButton(onPressed: onPressed, child: Text(label));
+    }
+    return FilledButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon),
+      label: Text(label),
     );
   }
 }

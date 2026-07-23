@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Quote {
 
- String get id; Money get sourceAmount; Money get fee; FeeBreakdown get feeBreakdown; Money get destAmount; Rate get rate; DateTime get expiresAt;
+ String get id; Money get sourceAmount; Money get fee; FeeBreakdown get feeBreakdown; Money get destAmount; Rate get rate; DateTime get createdAt; DateTime get expiresAt;
 /// Create a copy of Quote
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $QuoteCopyWith<Quote> get copyWith => _$QuoteCopyWithImpl<Quote>(this as Quote, 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Quote&&(identical(other.id, id) || other.id == id)&&(identical(other.sourceAmount, sourceAmount) || other.sourceAmount == sourceAmount)&&(identical(other.fee, fee) || other.fee == fee)&&(identical(other.feeBreakdown, feeBreakdown) || other.feeBreakdown == feeBreakdown)&&(identical(other.destAmount, destAmount) || other.destAmount == destAmount)&&(identical(other.rate, rate) || other.rate == rate)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Quote&&(identical(other.id, id) || other.id == id)&&(identical(other.sourceAmount, sourceAmount) || other.sourceAmount == sourceAmount)&&(identical(other.fee, fee) || other.fee == fee)&&(identical(other.feeBreakdown, feeBreakdown) || other.feeBreakdown == feeBreakdown)&&(identical(other.destAmount, destAmount) || other.destAmount == destAmount)&&(identical(other.rate, rate) || other.rate == rate)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,sourceAmount,fee,feeBreakdown,destAmount,rate,expiresAt);
+int get hashCode => Object.hash(runtimeType,id,sourceAmount,fee,feeBreakdown,destAmount,rate,createdAt,expiresAt);
 
 @override
 String toString() {
-  return 'Quote(id: $id, sourceAmount: $sourceAmount, fee: $fee, feeBreakdown: $feeBreakdown, destAmount: $destAmount, rate: $rate, expiresAt: $expiresAt)';
+  return 'Quote(id: $id, sourceAmount: $sourceAmount, fee: $fee, feeBreakdown: $feeBreakdown, destAmount: $destAmount, rate: $rate, createdAt: $createdAt, expiresAt: $expiresAt)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $QuoteCopyWith<$Res>  {
   factory $QuoteCopyWith(Quote value, $Res Function(Quote) _then) = _$QuoteCopyWithImpl;
 @useResult
 $Res call({
- String id, Money sourceAmount, Money fee, FeeBreakdown feeBreakdown, Money destAmount, Rate rate, DateTime expiresAt
+ String id, Money sourceAmount, Money fee, FeeBreakdown feeBreakdown, Money destAmount, Rate rate, DateTime createdAt, DateTime expiresAt
 });
 
 
@@ -62,7 +62,7 @@ class _$QuoteCopyWithImpl<$Res>
 
 /// Create a copy of Quote
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? sourceAmount = null,Object? fee = null,Object? feeBreakdown = null,Object? destAmount = null,Object? rate = null,Object? expiresAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? sourceAmount = null,Object? fee = null,Object? feeBreakdown = null,Object? destAmount = null,Object? rate = null,Object? createdAt = null,Object? expiresAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,sourceAmount: null == sourceAmount ? _self.sourceAmount : sourceAmount // ignore: cast_nullable_to_non_nullable
@@ -70,7 +70,8 @@ as Money,fee: null == fee ? _self.fee : fee // ignore: cast_nullable_to_non_null
 as Money,feeBreakdown: null == feeBreakdown ? _self.feeBreakdown : feeBreakdown // ignore: cast_nullable_to_non_nullable
 as FeeBreakdown,destAmount: null == destAmount ? _self.destAmount : destAmount // ignore: cast_nullable_to_non_nullable
 as Money,rate: null == rate ? _self.rate : rate // ignore: cast_nullable_to_non_nullable
-as Rate,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
+as Rate,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
 }
@@ -201,10 +202,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  Money sourceAmount,  Money fee,  FeeBreakdown feeBreakdown,  Money destAmount,  Rate rate,  DateTime expiresAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  Money sourceAmount,  Money fee,  FeeBreakdown feeBreakdown,  Money destAmount,  Rate rate,  DateTime createdAt,  DateTime expiresAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Quote() when $default != null:
-return $default(_that.id,_that.sourceAmount,_that.fee,_that.feeBreakdown,_that.destAmount,_that.rate,_that.expiresAt);case _:
+return $default(_that.id,_that.sourceAmount,_that.fee,_that.feeBreakdown,_that.destAmount,_that.rate,_that.createdAt,_that.expiresAt);case _:
   return orElse();
 
 }
@@ -222,10 +223,10 @@ return $default(_that.id,_that.sourceAmount,_that.fee,_that.feeBreakdown,_that.d
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  Money sourceAmount,  Money fee,  FeeBreakdown feeBreakdown,  Money destAmount,  Rate rate,  DateTime expiresAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  Money sourceAmount,  Money fee,  FeeBreakdown feeBreakdown,  Money destAmount,  Rate rate,  DateTime createdAt,  DateTime expiresAt)  $default,) {final _that = this;
 switch (_that) {
 case _Quote():
-return $default(_that.id,_that.sourceAmount,_that.fee,_that.feeBreakdown,_that.destAmount,_that.rate,_that.expiresAt);case _:
+return $default(_that.id,_that.sourceAmount,_that.fee,_that.feeBreakdown,_that.destAmount,_that.rate,_that.createdAt,_that.expiresAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -242,10 +243,10 @@ return $default(_that.id,_that.sourceAmount,_that.fee,_that.feeBreakdown,_that.d
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  Money sourceAmount,  Money fee,  FeeBreakdown feeBreakdown,  Money destAmount,  Rate rate,  DateTime expiresAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  Money sourceAmount,  Money fee,  FeeBreakdown feeBreakdown,  Money destAmount,  Rate rate,  DateTime createdAt,  DateTime expiresAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Quote() when $default != null:
-return $default(_that.id,_that.sourceAmount,_that.fee,_that.feeBreakdown,_that.destAmount,_that.rate,_that.expiresAt);case _:
+return $default(_that.id,_that.sourceAmount,_that.fee,_that.feeBreakdown,_that.destAmount,_that.rate,_that.createdAt,_that.expiresAt);case _:
   return null;
 
 }
@@ -257,7 +258,7 @@ return $default(_that.id,_that.sourceAmount,_that.fee,_that.feeBreakdown,_that.d
 
 
 class _Quote extends Quote {
-  const _Quote({required this.id, required this.sourceAmount, required this.fee, required this.feeBreakdown, required this.destAmount, required this.rate, required this.expiresAt}): super._();
+  const _Quote({required this.id, required this.sourceAmount, required this.fee, required this.feeBreakdown, required this.destAmount, required this.rate, required this.createdAt, required this.expiresAt}): super._();
   
 
 @override final  String id;
@@ -266,6 +267,7 @@ class _Quote extends Quote {
 @override final  FeeBreakdown feeBreakdown;
 @override final  Money destAmount;
 @override final  Rate rate;
+@override final  DateTime createdAt;
 @override final  DateTime expiresAt;
 
 /// Create a copy of Quote
@@ -278,16 +280,16 @@ _$QuoteCopyWith<_Quote> get copyWith => __$QuoteCopyWithImpl<_Quote>(this, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Quote&&(identical(other.id, id) || other.id == id)&&(identical(other.sourceAmount, sourceAmount) || other.sourceAmount == sourceAmount)&&(identical(other.fee, fee) || other.fee == fee)&&(identical(other.feeBreakdown, feeBreakdown) || other.feeBreakdown == feeBreakdown)&&(identical(other.destAmount, destAmount) || other.destAmount == destAmount)&&(identical(other.rate, rate) || other.rate == rate)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Quote&&(identical(other.id, id) || other.id == id)&&(identical(other.sourceAmount, sourceAmount) || other.sourceAmount == sourceAmount)&&(identical(other.fee, fee) || other.fee == fee)&&(identical(other.feeBreakdown, feeBreakdown) || other.feeBreakdown == feeBreakdown)&&(identical(other.destAmount, destAmount) || other.destAmount == destAmount)&&(identical(other.rate, rate) || other.rate == rate)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,sourceAmount,fee,feeBreakdown,destAmount,rate,expiresAt);
+int get hashCode => Object.hash(runtimeType,id,sourceAmount,fee,feeBreakdown,destAmount,rate,createdAt,expiresAt);
 
 @override
 String toString() {
-  return 'Quote(id: $id, sourceAmount: $sourceAmount, fee: $fee, feeBreakdown: $feeBreakdown, destAmount: $destAmount, rate: $rate, expiresAt: $expiresAt)';
+  return 'Quote(id: $id, sourceAmount: $sourceAmount, fee: $fee, feeBreakdown: $feeBreakdown, destAmount: $destAmount, rate: $rate, createdAt: $createdAt, expiresAt: $expiresAt)';
 }
 
 
@@ -298,7 +300,7 @@ abstract mixin class _$QuoteCopyWith<$Res> implements $QuoteCopyWith<$Res> {
   factory _$QuoteCopyWith(_Quote value, $Res Function(_Quote) _then) = __$QuoteCopyWithImpl;
 @override @useResult
 $Res call({
- String id, Money sourceAmount, Money fee, FeeBreakdown feeBreakdown, Money destAmount, Rate rate, DateTime expiresAt
+ String id, Money sourceAmount, Money fee, FeeBreakdown feeBreakdown, Money destAmount, Rate rate, DateTime createdAt, DateTime expiresAt
 });
 
 
@@ -315,7 +317,7 @@ class __$QuoteCopyWithImpl<$Res>
 
 /// Create a copy of Quote
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? sourceAmount = null,Object? fee = null,Object? feeBreakdown = null,Object? destAmount = null,Object? rate = null,Object? expiresAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? sourceAmount = null,Object? fee = null,Object? feeBreakdown = null,Object? destAmount = null,Object? rate = null,Object? createdAt = null,Object? expiresAt = null,}) {
   return _then(_Quote(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,sourceAmount: null == sourceAmount ? _self.sourceAmount : sourceAmount // ignore: cast_nullable_to_non_nullable
@@ -323,7 +325,8 @@ as Money,fee: null == fee ? _self.fee : fee // ignore: cast_nullable_to_non_null
 as Money,feeBreakdown: null == feeBreakdown ? _self.feeBreakdown : feeBreakdown // ignore: cast_nullable_to_non_nullable
 as FeeBreakdown,destAmount: null == destAmount ? _self.destAmount : destAmount // ignore: cast_nullable_to_non_nullable
 as Money,rate: null == rate ? _self.rate : rate // ignore: cast_nullable_to_non_nullable
-as Rate,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
+as Rate,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));
 }

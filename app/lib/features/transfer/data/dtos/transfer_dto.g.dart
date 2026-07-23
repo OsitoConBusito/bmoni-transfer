@@ -13,6 +13,7 @@ _TransferDto _$TransferDtoFromJson(Map<String, dynamic> json) => _TransferDto(
   sourceAmount: MoneyDto.fromJson(json['sourceAmount'] as Map<String, dynamic>),
   destAmount: MoneyDto.fromJson(json['destAmount'] as Map<String, dynamic>),
   fee: MoneyDto.fromJson(json['fee'] as Map<String, dynamic>),
+  rate: RateDto.fromJson(json['rate'] as Map<String, dynamic>),
   createdAt: json['createdAt'] as String,
 );
 
@@ -24,5 +25,6 @@ Map<String, dynamic> _$TransferDtoToJson(_TransferDto instance) =>
       'sourceAmount': instance.sourceAmount,
       'destAmount': instance.destAmount,
       'fee': instance.fee,
+      'rate': instance.rate,
       'createdAt': instance.createdAt,
     };

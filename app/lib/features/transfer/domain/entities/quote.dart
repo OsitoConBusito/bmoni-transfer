@@ -16,11 +16,16 @@ abstract class Quote with _$Quote {
     required FeeBreakdown feeBreakdown,
     required Money destAmount,
     required Rate rate,
+    required DateTime createdAt,
     required DateTime expiresAt,
   }) = _Quote;
 
-  /// What actually gets converted to USD: the send minus the deducted fee.
   Money get convertedAmount => sourceAmount.minus(fee);
+
+  /// The quote's real rate-hold window (createdAt → expiresAt) — fixed
+  /// regardless of when a countdown widget happens to mount, unlike deriving
+  /// a "total" from whatever time is left at that moment.
+  Duration get holdDuration => expiresAt.difference(createdAt);
 
   bool isExpiredAt(DateTime now) => !now.isBefore(expiresAt);
 

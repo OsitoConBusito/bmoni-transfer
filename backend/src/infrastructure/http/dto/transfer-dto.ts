@@ -9,5 +9,6 @@ export const toTransferResponse = (transfer: Transfer) => ({
   sourceAmount: moneyDto(transfer.sourceAmount),
   destAmount: moneyDto(transfer.destAmount),
   fee: moneyDto(transfer.fee),
+  rate: { value: transfer.rate.value, source: transfer.rate.source, asOf: transfer.rate.asOf },
   createdAt: new Date(transfer.createdAt).toISOString(),
 });

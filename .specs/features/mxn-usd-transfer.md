@@ -219,9 +219,14 @@ CORS habilitado (permite correr el Flutter en web). Logger estructurado **pino**
   },
   "destAmount":   { "minorUnits": 5624,   "currency": "USD" },
   "rate": { "value": "0.05739", "source": "frankfurter", "asOf": "2026-07-22" },
+  "createdAt": "2026-07-22T19:00:00Z",
   "expiresAt": "2026-07-22T19:00:60Z"
 }
 ```
+
+`createdAt` deja al cliente calcular el TTL real de la quote (`expiresAt − createdAt`) en vez de asumir
+un valor fijo — necesario para un countdown correcto si la pantalla de confirmación se remonta con la
+misma quote (ej. el usuario vuelve a la pantalla anterior y navega de nuevo sin recotizar).
 `feeBreakdown` explica cómo se compuso la comisión, para que el cliente lo muestre **sin hardcodear
 la política**: `fixed` (parte plana) + `variable` (parte porcentual, `0` bajo el umbral), más la regla
 (`threshold`, `percentBasisPoints`). El `fee` total = `fixed + variable`. El % se aplica al monto
@@ -249,6 +254,7 @@ El body **solo** lleva `quoteId`. El BE recupera la quote guardada, verifica exp
   "sourceAmount": { "minorUnits": 100050, "currency": "MXN" },
   "destAmount":   { "minorUnits": 5624,   "currency": "USD" },
   "fee":          { "minorUnits": 2000,   "currency": "MXN" },
+  "rate": { "value": "0.05739", "source": "frankfurter", "asOf": "2026-07-22" },
   "createdAt": "2026-07-22T19:00:30Z"
 }
 ```

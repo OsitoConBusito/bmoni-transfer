@@ -38,9 +38,14 @@ class _ConfirmationPageState extends ConsumerState<ConfirmationPage> {
   void initState() {
     super.initState();
     _remaining = widget.quote.remainingAt(DateTime.now());
-    _total = _remaining == Duration.zero
+    // The quote's real hold window (createdAt → expiresAt), not whatever time
+    // happens to remain right now — re-entering this screen with the same
+    // quote (e.g. back then forward without re-quoting) must not shrink the
+    // countdown's 100% reference to the leftover time.
+    final holdDuration = widget.quote.holdDuration;
+    _total = holdDuration <= Duration.zero
         ? const Duration(seconds: 1)
-        : _remaining;
+        : holdDuration;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       final remaining = widget.quote.remainingAt(DateTime.now());
       setState(() => _remaining = remaining);
@@ -90,15 +95,21 @@ class _ConfirmationPageState extends ConsumerState<ConfirmationPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _Hero(amount: widget.quote.sourceAmount),
+              _Hero(amount: widget.quote.sourceAmount, dimmed: expired),
               const Gap(AppSpacing.lg),
-              _Breakdown(quote: widget.quote),
+              _Breakdown(quote: widget.quote, dimmed: expired),
               const Gap(AppSpacing.md),
-              if (!expired)
+              if (expired)
+                const _ExpiredNotice()
+              else
                 _Countdown(remaining: _remaining, total: _total),
               const Spacer(),
               if (expired)
-                _ExpiredNotice(onBack: () => context.pop())
+                AppButton(
+                  label: translations.confirmation.backToQuote,
+                  icon: Icons.refresh,
+                  onPressed: () => context.pop(),
+                )
               else
                 AppButton(
                   label: translations.confirmation.confirmCta,
@@ -115,20 +126,27 @@ class _ConfirmationPageState extends ConsumerState<ConfirmationPage> {
 }
 
 class _Hero extends StatelessWidget {
-  const _Hero({required this.amount});
+  const _Hero({required this.amount, required this.dimmed});
 
   final Money amount;
+
+  /// A stale (expired) quote: the big amount drops to `disabledEmphasis`
+  /// gray instead of its normal color — the section label stays as-is.
+  final bool dimmed;
 
   @override
   Widget build(BuildContext context) {
     final translations = Translations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.extension<AppColors>();
     return Column(
       children: [
         AppSectionLabel(translations.confirmation.heroLabel),
         const Gap(AppSpacing.sm),
         AppMoneyText(
           amount,
-          style: Theme.of(context).textTheme.displaySmall,
+          style: theme.textTheme.displaySmall,
+          color: dimmed ? colors?.disabledEmphasis : null,
         ),
       ],
     );
@@ -136,40 +154,55 @@ class _Hero extends StatelessWidget {
 }
 
 class _Breakdown extends StatelessWidget {
-  const _Breakdown({required this.quote});
+  const _Breakdown({required this.quote, required this.dimmed});
 
   final Quote quote;
+
+  /// A stale (expired) quote: every label/value collapses to `disabled` gray
+  /// (the big "recipient gets" amount to `disabledEmphasis`) instead of the
+  /// normal fee/positive colors — matching the design rather than just
+  /// lowering opacity uniformly.
+  final bool dimmed;
 
   @override
   Widget build(BuildContext context) {
     final translations = Translations.of(context);
     final theme = Theme.of(context);
     final colors = theme.extension<AppColors>();
+    final muted = dimmed ? colors?.disabled : null;
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _Line(
             label: translations.confirmation.fee,
-            value: AppMoneyText(quote.fee, color: colors?.fee, negative: true),
+            labelColor: muted,
+            value: AppMoneyText(
+              quote.fee,
+              color: muted ?? colors?.fee,
+              negative: true,
+            ),
           ),
           const Gap(AppSpacing.xs),
           Align(
             alignment: Alignment.centerLeft,
-            child: FeeExplanation(breakdown: quote.feeBreakdown),
+            child: FeeExplanation(breakdown: quote.feeBreakdown, color: muted),
           ),
           const Gap(AppSpacing.sm),
           _Line(
             label: translations.confirmation.converted,
-            value: AppMoneyText(quote.convertedAmount),
+            labelColor: muted,
+            value: AppMoneyText(quote.convertedAmount, color: muted),
           ),
           const Gap(AppSpacing.sm),
           _Line(
             label: translations.confirmation.rate,
+            labelColor: muted,
             value: Text(
               translations.common.rateValue(rate: quote.rate.value),
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
+                color: muted,
               ),
             ),
           ),
@@ -177,10 +210,11 @@ class _Breakdown extends StatelessWidget {
           _Line(
             label: translations.confirmation.youReceive,
             emphasizeLabel: true,
+            labelColor: muted,
             value: AppMoneyText(
               quote.destAmount,
               style: theme.textTheme.headlineSmall,
-              color: colors?.positive,
+              color: dimmed ? colors?.disabledEmphasis : colors?.positive,
             ),
           ),
         ],
@@ -194,11 +228,13 @@ class _Line extends StatelessWidget {
     required this.label,
     required this.value,
     this.emphasizeLabel = false,
+    this.labelColor,
   });
 
   final String label;
   final Widget value;
   final bool emphasizeLabel;
+  final Color? labelColor;
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +246,7 @@ class _Line extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+            color: labelColor ?? theme.colorScheme.onSurfaceVariant,
             fontWeight: emphasizeLabel ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
@@ -220,8 +256,6 @@ class _Line extends StatelessWidget {
   }
 }
 
-/// The rate-hold countdown. The bar drains toward zero as the quote nears
-/// expiry — a visible signal that the price is time-boxed, in the warning tone.
 class _Countdown extends StatelessWidget {
   const _Countdown({required this.remaining, required this.total});
 
@@ -277,10 +311,9 @@ class _Countdown extends StatelessWidget {
   }
 }
 
+// The retry CTA lives separately, pinned at the screen bottom.
 class _ExpiredNotice extends StatelessWidget {
-  const _ExpiredNotice({required this.onBack});
-
-  final VoidCallback onBack;
+  const _ExpiredNotice();
 
   @override
   Widget build(BuildContext context) {
@@ -288,37 +321,27 @@ class _ExpiredNotice extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.extension<AppColors>();
     final tone = colors?.fee ?? theme.colorScheme.error;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: tone.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(AppRadii.lg),
-            border: Border.all(color: tone.withValues(alpha: 0.4)),
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: tone.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(color: tone.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            translations.confirmation.expiredTitle,
+            style: theme.textTheme.titleMedium?.copyWith(color: tone),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                translations.confirmation.expiredTitle,
-                style: theme.textTheme.titleMedium?.copyWith(color: tone),
-              ),
-              const Gap(AppSpacing.xs),
-              Text(
-                translations.confirmation.expiredBody,
-                style: theme.textTheme.bodyMedium?.copyWith(color: tone),
-              ),
-            ],
+          const Gap(AppSpacing.xs),
+          Text(
+            translations.confirmation.expiredBody,
+            style: theme.textTheme.bodyMedium?.copyWith(color: tone),
           ),
-        ),
-        const Gap(AppSpacing.md),
-        AppButton(
-          label: translations.confirmation.backToQuote,
-          onPressed: onBack,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

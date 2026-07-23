@@ -28,6 +28,7 @@ final _quote = Quote(
   ),
   destAmount: const Money(minorUnits: 5624, currency: Currency.usd),
   rate: const Rate(value: '0.05739', source: 'stub', asOf: '2026-07-22'),
+  createdAt: DateTime.utc(2026, 7, 22, 19),
   expiresAt: DateTime.utc(2026, 7, 22, 19, 1),
 );
 

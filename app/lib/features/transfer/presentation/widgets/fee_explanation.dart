@@ -3,13 +3,12 @@ import 'package:bmoni_transfer/i18n/strings.g.dart';
 import 'package:bmoni_transfer/shared/utils/money_formatting.dart';
 import 'package:flutter/material.dart';
 
-/// One muted caption explaining how the fee was composed, straight from the
-/// backend breakdown: a flat fee, or flat + percent once the amount crosses the
-/// threshold. Amounts drop the currency code — the row above already names MXN.
+// Amounts drop the currency code — the row above already names MXN.
 class FeeExplanation extends StatelessWidget {
-  const FeeExplanation({required this.breakdown, super.key});
+  const FeeExplanation({required this.breakdown, this.color, super.key});
 
   final FeeBreakdown breakdown;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +27,7 @@ class FeeExplanation extends StatelessWidget {
     return Text(
       text,
       style: theme.textTheme.bodySmall?.copyWith(
-        color: theme.colorScheme.onSurfaceVariant,
+        color: color ?? theme.colorScheme.onSurfaceVariant,
       ),
     );
   }

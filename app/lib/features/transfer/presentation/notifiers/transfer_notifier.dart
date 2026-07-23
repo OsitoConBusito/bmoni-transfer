@@ -12,7 +12,10 @@ part 'transfer_notifier.g.dart';
 @riverpod
 class TransferNotifier extends _$TransferNotifier {
   // Generated once per quote so retries of the same transfer reuse the key.
-  late final String _idempotencyKey;
+  // Not `final`: `build()` can run again on this instance on some Riverpod
+  // invalidation edge cases, and a `late final` would throw "already
+  // initialized" the second time (see QuoteNotifier._debouncer).
+  late String _idempotencyKey;
 
   @override
   FutureOr<Transfer?> build(String quoteId) {

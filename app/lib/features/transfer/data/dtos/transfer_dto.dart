@@ -1,4 +1,5 @@
 import 'package:bmoni_transfer/features/transfer/data/dtos/money_dto.dart';
+import 'package:bmoni_transfer/features/transfer/data/dtos/rate_dto.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'transfer_dto.freezed.dart';
@@ -13,6 +14,7 @@ abstract class TransferDto with _$TransferDto {
     required MoneyDto sourceAmount,
     required MoneyDto destAmount,
     required MoneyDto fee,
+    required RateDto rate,
     required String createdAt,
   }) = _TransferDto;
 

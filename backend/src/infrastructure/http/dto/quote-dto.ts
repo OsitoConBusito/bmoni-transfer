@@ -14,5 +14,6 @@ export const toQuoteResponse = (quote: Quote) => ({
   },
   destAmount: moneyDto(quote.destAmount),
   rate: { value: quote.rate.value, source: quote.rate.source, asOf: quote.rate.asOf },
+  createdAt: new Date(quote.createdAt).toISOString(),
   expiresAt: new Date(quote.expiresAt).toISOString(),
 });

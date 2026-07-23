@@ -14,6 +14,7 @@ abstract class QuoteDto with _$QuoteDto {
     required FeeBreakdownDto feeBreakdown,
     required MoneyDto destAmount,
     required RateDto rate,
+    required String createdAt,
     required String expiresAt,
   }) = _QuoteDto;
 

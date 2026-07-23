@@ -2,7 +2,7 @@
 abstract final class AppSizing {
   static const double buttonHeight = 56;
   static const double spinner = 20;
-  static const double resultIcon = 72;
+  static const double errorBadge = 56;
   static const double shimmerBlock = 72;
   static const double shimmerLine = 16;
 

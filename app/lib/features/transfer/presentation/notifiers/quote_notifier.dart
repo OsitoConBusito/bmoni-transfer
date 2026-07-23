@@ -13,7 +13,11 @@ part 'quote_notifier.g.dart';
 // Idle is AsyncData(null); a failure carries the typed Failure as the error.
 @riverpod
 class QuoteNotifier extends _$QuoteNotifier {
-  late final Debouncer _debouncer;
+  // Not `final`: `build()` is Riverpod's contract for (re)initialization and
+  // can run again on invalidation edge cases (e.g. resetting this provider
+  // while its widget is mid-transition) — a `late final` here would throw
+  // "already initialized" the second time.
+  late Debouncer _debouncer;
   int _requestId = 0;
 
   @override

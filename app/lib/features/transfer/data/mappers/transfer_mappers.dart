@@ -27,6 +27,7 @@ extension QuoteDtoMapper on QuoteDto {
     feeBreakdown: feeBreakdown.toDomain(),
     destAmount: destAmount.toDomain(),
     rate: rate.toDomain(),
+    createdAt: DateTime.parse(createdAt),
     expiresAt: DateTime.parse(expiresAt),
   );
 }
@@ -47,6 +48,7 @@ extension TransferDtoMapper on TransferDto {
     sourceAmount: sourceAmount.toDomain(),
     destAmount: destAmount.toDomain(),
     fee: fee.toDomain(),
+    rate: rate.toDomain(),
     createdAt: DateTime.parse(createdAt),
   );
 }

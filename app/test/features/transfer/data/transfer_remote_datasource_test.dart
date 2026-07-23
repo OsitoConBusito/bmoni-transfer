@@ -22,6 +22,7 @@ Map<String, dynamic> _quoteBody({String destCurrency = 'USD'}) => {
   },
   'destAmount': {'minorUnits': 5624, 'currency': destCurrency},
   'rate': {'value': '0.05739', 'source': 'stub', 'asOf': '2026-07-22'},
+  'createdAt': '2026-07-22T19:00:00.000Z',
   'expiresAt': '2026-07-22T19:01:00.000Z',
 };
 

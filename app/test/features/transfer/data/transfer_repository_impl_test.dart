@@ -32,6 +32,7 @@ final _quote = Quote(
   feeBreakdown: _feeBreakdown,
   destAmount: _usd,
   rate: _rate,
+  createdAt: DateTime.utc(2026, 7, 22, 19),
   expiresAt: DateTime.utc(2026, 7, 22, 19, 1),
 );
 
@@ -41,6 +42,7 @@ final _transfer = Transfer(
   sourceAmount: _mxn,
   destAmount: _usd,
   fee: _fee,
+  rate: _rate,
   createdAt: DateTime.utc(2026, 7, 22, 19),
 );
 

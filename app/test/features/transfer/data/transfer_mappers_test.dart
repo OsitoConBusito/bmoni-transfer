@@ -22,6 +22,7 @@ void main() {
         ),
         destAmount: MoneyDto(minorUnits: 5624, currency: 'USD'),
         rate: RateDto(value: '0.05739', source: 'stub', asOf: '2026-07-22'),
+        createdAt: '2026-07-22T19:00:00.000Z',
         expiresAt: '2026-07-22T19:01:00.000Z',
       );
 
@@ -46,6 +47,7 @@ void main() {
         sourceAmount: MoneyDto(minorUnits: 100000, currency: 'MXN'),
         destAmount: MoneyDto(minorUnits: 5624, currency: 'USD'),
         fee: MoneyDto(minorUnits: 2000, currency: 'MXN'),
+        rate: RateDto(value: '0.05739', source: 'stub', asOf: '2026-07-22'),
         createdAt: '2026-07-22T19:00:30.000Z',
       );
 
