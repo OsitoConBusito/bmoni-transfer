@@ -108,17 +108,24 @@ With more time, in priority order:
  TIME SPENT
 --------------------------------------------------------------------------------
 
-The brief scopes this at 2-3h. Actual effort came in well above that —
-~14h40m estimated / ~18h30m actual across every PR (table below). Backend
-landed close to estimate; the frontend ran over on Clean Arch reorg + codegen
-+ reviewer-requested fixes, and a later design-fidelity pass (matching a
-Claude Design mockup closely — fonts, exact colors, page-transition
-animations) drove the biggest overrun. In hindsight, that pass chased a
-level of visual polish the brief explicitly says not to spend time on
-("clean and usable beats pretty") — worth flagging honestly rather than
-quietly absorbing into the number.
+The brief scopes this at 2-3h. My own active time — reviewing each PR,
+directing the work, verifying on-device, giving feedback — was **~3-4h**,
+close to that scope.
 
-PR#   Unit                                          Estimated  Actual
+The table below tracks something different: session/build duration per PR,
+which includes stretches where the AI executed autonomously between my
+check-ins, across multiple sessions spread over more than one day. Summed
+up it comes to ~14h40m estimated / ~18h30m of that cumulative time — not
+hours I sat continuously working, but still a real signal of where the
+build concentrated effort. The frontend ran over its own estimates on Clean
+Arch reorg + codegen + reviewer-requested fixes, and a later design-fidelity
+pass (matching a Claude Design mockup closely — fonts, exact colors,
+page-transition animations) accounts for the biggest chunk. In hindsight,
+that pass chased a level of visual polish the brief explicitly says not to
+spend time on ("clean and usable beats pretty") — worth flagging honestly
+rather than absorbing quietly.
+
+PR#   Unit                                          Estimated  Session time
 ----  --------------------------------------------  ---------  --------
 #1    Design import + token extraction               20m        ~15m
 #2    Money + Rate value objects (integer math)       45m        ~40m
