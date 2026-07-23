@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('given the app boots in English, then the landing renders', (
+  testWidgets('given English, when the app boots, then landing renders', (
     tester,
   ) async {
     LocaleSettings.setLocaleSync(AppLocale.en);

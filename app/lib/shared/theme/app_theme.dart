@@ -1,4 +1,4 @@
-import 'package:bmoni_transfer/core/theme/app_colors.dart';
+import 'package:bmoni_transfer/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 /// Light and dark themes seeded from the BMONI brand teal, with the `AppColors`

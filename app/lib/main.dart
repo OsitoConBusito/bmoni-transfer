@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:bmoni_transfer/core/design_system/tokens/app_spacing.dart';
-import 'package:bmoni_transfer/core/theme/app_theme.dart';
 import 'package:bmoni_transfer/i18n/strings.g.dart';
+import 'package:bmoni_transfer/shared/design_system/tokens/app_spacing.dart';
+import 'package:bmoni_transfer/shared/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
