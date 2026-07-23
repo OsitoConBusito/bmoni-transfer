@@ -4,6 +4,9 @@ import 'package:bmoni_transfer/features/transfer/data/datasources/dio_error_mapp
 import 'package:bmoni_transfer/features/transfer/data/datasources/transfer_api.dart';
 import 'package:bmoni_transfer/features/transfer/data/dtos/quote_dto.dart';
 import 'package:bmoni_transfer/features/transfer/data/dtos/transfer_dto.dart';
+import 'package:bmoni_transfer/features/transfer/data/mappers/transfer_mappers.dart';
+import 'package:bmoni_transfer/features/transfer/domain/entities/quote.dart';
+import 'package:bmoni_transfer/features/transfer/domain/entities/transfer.dart';
 import 'package:dio/dio.dart';
 
 class TransferRemoteDatasource {
@@ -11,13 +14,13 @@ class TransferRemoteDatasource {
 
   final Dio _dio;
 
-  Future<Result<QuoteDto>> getQuote(String amount) async {
+  Future<Result<Quote>> getQuote(String amount) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         TransferApi.quotePath,
         queryParameters: {TransferApi.amountParam: amount},
       );
-      return Ok(QuoteDto.fromJson(response.data!));
+      return Ok(QuoteDto.fromJson(response.data!).toDomain());
     } on DioException catch (error) {
       return Err(mapDioError(error));
     } on Object {
@@ -25,7 +28,7 @@ class TransferRemoteDatasource {
     }
   }
 
-  Future<Result<TransferDto>> createTransfer({
+  Future<Result<Transfer>> createTransfer({
     required String quoteId,
     required String idempotencyKey,
   }) async {
@@ -37,7 +40,7 @@ class TransferRemoteDatasource {
           headers: {TransferApi.idempotencyKeyHeader: idempotencyKey},
         ),
       );
-      return Ok(TransferDto.fromJson(response.data!));
+      return Ok(TransferDto.fromJson(response.data!).toDomain());
     } on DioException catch (error) {
       return Err(mapDioError(error));
     } on Object {

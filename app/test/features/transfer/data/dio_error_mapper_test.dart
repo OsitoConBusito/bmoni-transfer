@@ -27,11 +27,11 @@ Object _envelope(String code, {String? field}) {
 
 void main() {
   group('mapDioError', () {
-    test('given no response, then NetworkFailure', () {
+    test('given no response, when mapDioError, then NetworkFailure', () {
       expect(mapDioError(_dioError(null)), isA<NetworkFailure>());
     });
 
-    test('given 400, then ValidationFailure with code and field', () {
+    test('given a 400, when mapDioError, then ValidationFailure', () {
       final failure = mapDioError(
         _dioError(400, data: _envelope('AMOUNT_TOO_LOW', field: 'amount')),
       );
@@ -40,7 +40,7 @@ void main() {
       expect(failure.field, 'amount');
     });
 
-    test('given 404, then NotFoundFailure with code', () {
+    test('given a 404, when mapDioError, then NotFoundFailure', () {
       final failure = mapDioError(
         _dioError(404, data: _envelope('QUOTE_NOT_FOUND')),
       );
@@ -48,7 +48,7 @@ void main() {
       expect((failure as NotFoundFailure).code, 'QUOTE_NOT_FOUND');
     });
 
-    test('given 409, then ConflictFailure with code', () {
+    test('given a 409, when mapDioError, then ConflictFailure', () {
       final failure = mapDioError(
         _dioError(409, data: _envelope('QUOTE_EXPIRED')),
       );
@@ -56,11 +56,11 @@ void main() {
       expect((failure as ConflictFailure).code, 'QUOTE_EXPIRED');
     });
 
-    test('given 503, then RateUnavailableFailure', () {
+    test('given a 503, when mapDioError, then RateUnavailableFailure', () {
       expect(mapDioError(_dioError(503)), isA<RateUnavailableFailure>());
     });
 
-    test('given 500, then UnexpectedFailure', () {
+    test('given a 500, when mapDioError, then UnexpectedFailure', () {
       expect(mapDioError(_dioError(500)), isA<UnexpectedFailure>());
     });
   });
