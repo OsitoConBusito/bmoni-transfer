@@ -84,6 +84,21 @@ export class Money {
     return Money.ofMinor(Number(targetMinor), target);
   }
 
+  /**
+   * This amount times an integer fraction numerator/denominator, rounded half-up, same
+   * currency. Exact via BigInt — used e.g. for a percentage as basis points (1% = 100/10000).
+   */
+  fraction(numerator: number, denominator: number): Money {
+    if (!Number.isInteger(numerator) || !Number.isInteger(denominator) || denominator <= 0) {
+      throw new MoneyError(`fraction requires integer numerator and positive denominator`);
+    }
+    if (this.minorUnits < 0) {
+      throw new MoneyError("fraction is only defined for non-negative amounts");
+    }
+    const product = BigInt(this.minorUnits) * BigInt(numerator);
+    return Money.ofMinor(Number(halfUpDivide(product, BigInt(denominator))), this.currency);
+  }
+
   private assertSameCurrency(other: Money): void {
     if (other.currency !== this.currency) {
       throw new MoneyError(`Currency mismatch: ${this.currency} vs ${other.currency}`);
