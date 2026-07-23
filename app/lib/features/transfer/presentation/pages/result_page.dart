@@ -2,12 +2,15 @@ import 'package:bmoni_transfer/core/error/failure.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/transfer.dart';
 import 'package:bmoni_transfer/features/transfer/presentation/utils/failure_message.dart';
 import 'package:bmoni_transfer/i18n/strings.g.dart';
+import 'package:bmoni_transfer/shared/design_system/tokens/app_sizing.dart';
 import 'package:bmoni_transfer/shared/design_system/tokens/app_spacing.dart';
 import 'package:bmoni_transfer/shared/design_system/widgets/app_button.dart';
+import 'package:bmoni_transfer/shared/router/app_router.dart';
 import 'package:bmoni_transfer/shared/theme/app_colors.dart';
 import 'package:bmoni_transfer/shared/utils/money_formatting.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 
 class ResultPage extends StatelessWidget {
   const ResultPage.success(Transfer transfer, {super.key})
@@ -22,7 +25,7 @@ class ResultPage extends StatelessWidget {
   final Failure? _failure;
 
   void _backToStart(BuildContext context) {
-    Navigator.of(context).popUntil((route) => route.isFirst);
+    context.go(AppRoute.amountEntry);
   }
 
   @override
@@ -43,7 +46,7 @@ class ResultPage extends StatelessWidget {
               const Spacer(),
               Icon(
                 isSuccess ? Icons.check_circle_outline : Icons.error_outline,
-                size: 72,
+                size: AppSizing.resultIcon,
                 color: isSuccess
                     ? (colors?.positive ?? theme.colorScheme.primary)
                     : theme.colorScheme.error,
@@ -69,7 +72,7 @@ class ResultPage extends StatelessWidget {
               if (!isSuccess) ...[
                 AppButton(
                   label: translations.result.retryCta,
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => context.pop(),
                 ),
                 const Gap(AppSpacing.sm),
               ],

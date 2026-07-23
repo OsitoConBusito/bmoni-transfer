@@ -1,19 +1,21 @@
 import 'package:bmoni_transfer/core/error/failure.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/quote.dart';
 import 'package:bmoni_transfer/features/transfer/presentation/notifiers/quote_notifier.dart';
-import 'package:bmoni_transfer/features/transfer/presentation/pages/confirmation_page.dart';
 import 'package:bmoni_transfer/features/transfer/presentation/utils/failure_message.dart';
 import 'package:bmoni_transfer/i18n/strings.g.dart';
+import 'package:bmoni_transfer/shared/design_system/tokens/app_sizing.dart';
 import 'package:bmoni_transfer/shared/design_system/tokens/app_spacing.dart';
 import 'package:bmoni_transfer/shared/design_system/widgets/app_button.dart';
 import 'package:bmoni_transfer/shared/design_system/widgets/app_card.dart';
 import 'package:bmoni_transfer/shared/design_system/widgets/app_error_state.dart';
 import 'package:bmoni_transfer/shared/design_system/widgets/app_money_text.dart';
 import 'package:bmoni_transfer/shared/design_system/widgets/app_shimmer.dart';
+import 'package:bmoni_transfer/shared/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 
 class AmountEntryPage extends ConsumerStatefulWidget {
   const AmountEntryPage({super.key});
@@ -120,7 +122,7 @@ class _QuoteBreakdown extends StatelessWidget {
               const Gap(AppSpacing.md),
               _Row(
                 label: translations.amountEntry.rate,
-                value: '1 MXN ≈ ${quote.rate.value} USD',
+                value: translations.common.rateValue(rate: quote.rate.value),
               ),
               const Gap(AppSpacing.sm),
               _Row(
@@ -133,11 +135,7 @@ class _QuoteBreakdown extends StatelessWidget {
         const Spacer(),
         AppButton(
           label: translations.amountEntry.continueCta,
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => ConfirmationPage(quote: quote),
-            ),
-          ),
+          onPressed: () => context.push(AppRoute.confirmation, extra: quote),
         ),
       ],
     );
@@ -153,11 +151,11 @@ class _QuoteShimmer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AppShimmerBox(height: 72),
+          AppShimmerBox(height: AppSizing.shimmerBlock),
           Gap(AppSpacing.md),
-          AppShimmerBox(height: 16),
+          AppShimmerBox(height: AppSizing.shimmerLine),
           Gap(AppSpacing.sm),
-          AppShimmerBox(height: 16),
+          AppShimmerBox(height: AppSizing.shimmerLine),
         ],
       ),
     );

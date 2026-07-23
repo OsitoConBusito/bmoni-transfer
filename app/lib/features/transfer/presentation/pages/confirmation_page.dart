@@ -1,20 +1,20 @@
 import 'dart:async';
 
-import 'package:bmoni_transfer/core/error/failure.dart';
 import 'package:bmoni_transfer/core/money/money.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/quote.dart';
 import 'package:bmoni_transfer/features/transfer/domain/entities/transfer.dart';
 import 'package:bmoni_transfer/features/transfer/presentation/notifiers/transfer_notifier.dart';
-import 'package:bmoni_transfer/features/transfer/presentation/pages/result_page.dart';
 import 'package:bmoni_transfer/i18n/strings.g.dart';
 import 'package:bmoni_transfer/shared/design_system/tokens/app_spacing.dart';
 import 'package:bmoni_transfer/shared/design_system/widgets/app_button.dart';
 import 'package:bmoni_transfer/shared/design_system/widgets/app_card.dart';
 import 'package:bmoni_transfer/shared/design_system/widgets/app_money_text.dart';
+import 'package:bmoni_transfer/shared/router/app_router.dart';
 import 'package:bmoni_transfer/shared/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 
 class ConfirmationPage extends ConsumerStatefulWidget {
   const ConfirmationPage({required this.quote, super.key});
@@ -48,12 +48,8 @@ class _ConfirmationPageState extends ConsumerState<ConfirmationPage> {
     super.dispose();
   }
 
-  void _openResult(Widget page) {
-    unawaited(
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute<void>(builder: (_) => page)),
-    );
+  void _openResult(Object outcome) {
+    unawaited(context.push(AppRoute.result, extra: outcome));
   }
 
   @override
@@ -64,9 +60,9 @@ class _ConfirmationPageState extends ConsumerState<ConfirmationPage> {
 
     ref.listen(provider, (_, next) {
       if (next case AsyncData(value: final Transfer transfer)) {
-        _openResult(ResultPage.success(transfer));
+        _openResult(transfer);
       } else if (next case AsyncError(:final error)) {
-        _openResult(ResultPage.failure(error as Failure));
+        _openResult(error);
       }
     });
 
@@ -82,7 +78,7 @@ class _ConfirmationPageState extends ConsumerState<ConfirmationPage> {
             _Breakdown(quote: widget.quote),
             const Spacer(),
             if (expired)
-              _ExpiredNotice(onBack: () => Navigator.of(context).pop())
+              _ExpiredNotice(onBack: () => context.pop())
             else ...[
               Text(
                 translations.confirmation.expiresIn(
@@ -131,7 +127,7 @@ class _Breakdown extends StatelessWidget {
           const Gap(AppSpacing.sm),
           _TextLine(
             label: translations.confirmation.rate,
-            value: '1 MXN ≈ ${quote.rate.value} USD',
+            value: translations.common.rateValue(rate: quote.rate.value),
           ),
           const Divider(height: AppSpacing.lg),
           _Line(

@@ -190,6 +190,9 @@ class Translations$common$en {
 
 	/// en: 'Retry'
 	String get retry => 'Retry';
+
+	/// en: '1 MXN ≈ {rate} USD'
+	String rateValue({required Object rate}) => '1 MXN ≈ ${rate} USD';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -233,6 +236,7 @@ extension on Translations {
 			'errors.quoteExpired' => 'This quote expired. Please request a new one.',
 			'errors.unexpected' => 'Something went wrong. Please try again.',
 			'common.retry' => 'Retry',
+			'common.rateValue' => ({required Object rate}) => '1 MXN ≈ ${rate} USD',
 			_ => null,
 		};
 	}

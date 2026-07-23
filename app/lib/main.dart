@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:bmoni_transfer/features/transfer/presentation/pages/amount_entry_page.dart';
 import 'package:bmoni_transfer/i18n/strings.g.dart';
+import 'package:bmoni_transfer/shared/router/app_router.dart';
 import 'package:bmoni_transfer/shared/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,14 +21,14 @@ class BmoniApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'BMONI',
       debugShowCheckedModeBanner: false,
       locale: TranslationProvider.of(context).flutterLocale,
       supportedLocales: AppLocaleUtils.supportedLocales,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      home: const AmountEntryPage(),
+      routerConfig: appRouter,
     );
   }
 }

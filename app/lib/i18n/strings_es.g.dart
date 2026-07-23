@@ -120,6 +120,7 @@ class _Translations$common$es implements Translations$common$en {
 
 	// Translations
 	@override String get retry => 'Reintentar';
+	@override String rateValue({required Object rate}) => '1 MXN ≈ ${rate} USD';
 }
 
 /// The flat map containing all translations for locale <es>.
@@ -163,6 +164,7 @@ extension on TranslationsEs {
 			'errors.quoteExpired' => 'Esta cotización expiró. Solicita una nueva.',
 			'errors.unexpected' => 'Algo salió mal. Intenta de nuevo.',
 			'common.retry' => 'Reintentar',
+			'common.rateValue' => ({required Object rate}) => '1 MXN ≈ ${rate} USD',
 			_ => null,
 		};
 	}

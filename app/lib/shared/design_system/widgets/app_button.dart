@@ -1,4 +1,5 @@
 import 'package:bmoni_transfer/shared/design_system/tokens/app_radii.dart';
+import 'package:bmoni_transfer/shared/design_system/tokens/app_sizing.dart';
 import 'package:flutter/material.dart';
 
 class AppButton extends StatelessWidget {
@@ -13,23 +14,20 @@ class AppButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
 
-  static const double _height = 52;
-  static const double _spinnerSize = 20;
-
   @override
   Widget build(BuildContext context) {
     return FilledButton(
       onPressed: isLoading ? null : onPressed,
       style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(_height),
+        minimumSize: const Size.fromHeight(AppSizing.buttonHeight),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.md),
         ),
       ),
       child: isLoading
           ? const SizedBox(
-              height: _spinnerSize,
-              width: _spinnerSize,
+              height: AppSizing.spinner,
+              width: AppSizing.spinner,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
           : Text(label),
