@@ -30,6 +30,38 @@ Solo la dirección MXN → USD (no USD → MXN). Un solo par de divisas.
 
 ---
 
+## Arquitectura
+
+Principio: arquitectura **intencional pero calibrada al slice** — capas reales, cero ceremonia.
+El acoplamiento va hacia adentro (infra → application → domain); domain no conoce Express, HTTP
+ni Flutter. Errores como valor con un `Result<T,E>` propio (hand-rolled, sin dependencia) en ambos
+lados; `try/catch` solo en el borde. Ver reglas en [/CLAUDE.md](../../CLAUDE.md).
+
+### Backend — Hexagonal-light (ports & adapters)
+```
+backend/src/
+├── domain/            money, rate, quote, transfer, fee; ports/ (RateProvider, repositories)
+├── application/       get-quote.use-case, create-transfer.use-case  (devuelven Result)
+├── infrastructure/    http/ (handlers, router, error-map) · rate/ (frankfurter, stub, cached) · persistence/ (in-memory)
+└── shared/            Result, errors, config
+```
+Los **puertos** (`RateProvider`, `Repository`) hacen swappable el rate (stub↔real) y el storage
+(memoria↔DB) sin tocar el dominio. Handlers finos: parse+Zod → use case → map `Result` a HTTP.
+
+### Frontend — Clean Arch domain-first, feature-first (una feature `transfer`)
+```
+app/lib/
+├── core/                       Money, Result, http client, env/config
+└── features/transfer/
+    ├── domain/        entities (money, quote, transfer) · transfer_repository (iface) · usecases
+    ├── data/          dtos · datasources (http) · mappers · transfer_repository_impl
+    └── presentation/  providers (Riverpod notifiers) · pages (amount_entry, confirmation, result) · widgets (por estado)
+```
+`domain` no importa `data` ni Flutter. El dinero llega del BE y se mapea a `Money` en `data/`; el
+cliente nunca recalcula el rate. Estado con **Riverpod 3.0 codegen**; `AsyncValue` → loading/error/data.
+
+---
+
 ## Modelo de dinero (§ crítica)
 
 Enfoque adoptado de dinero.js/decimal.js, implementado en un value object **propio**

@@ -25,6 +25,15 @@ Las reglas globales de Clean Code (~/.claude/CLAUDE.md) aplican. Aquí van solo 
   `Idempotency-Key` header + barrera de doble-submit en Flutter. Ver § Idempotencia del spec.
 - El BE nunca confía en dinero enviado por el cliente: recupera la quote y recalcula.
 
+## Arquitectura (ver § Arquitectura del spec)
+- **Backend: hexagonal-light** — `domain/` (VOs + entities + `ports/`) → `application/` (use cases
+  que devuelven Result) → `infrastructure/` (http, rate adapters, persistence in-memory). `domain`
+  no importa Express/HTTP/AWS. Puertos `RateProvider` y `Repository` hacen swappable rate y storage.
+- **Frontend: Clean Arch domain-first, feature-first** — `features/transfer/{domain,data,presentation}`.
+  `domain` no importa `data` ni Flutter. DTOs solo en `data/`.
+- **Errores como valor:** `Result<T,E>` propio hand-rolled en ambos lados (BE: unión discriminada;
+  FE: sealed class). Sin lib. `try/catch` solo en el borde del handler o side-effects best-effort con log.
+
 ## Backend (Node/TS)
 - Express + Zod. Validación de input con Zod en el borde; errores tipados con envelope
   `{ error: { code, message, field? } }`. Códigos de error como unión cerrada de string-literals
