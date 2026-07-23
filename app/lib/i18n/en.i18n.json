@@ -1,4 +1,45 @@
 {
   "appName": "BMONI",
-  "tagline": "Send money from Mexico to the US"
+  "tagline": "Send money from Mexico to the US",
+  "amountEntry": {
+    "title": "Send money",
+    "amountLabel": "You send (MXN)",
+    "amountHint": "0.00",
+    "youReceive": "Recipient gets",
+    "rate": "Exchange rate",
+    "fee": "Fee",
+    "continueCta": "Continue"
+  },
+  "confirmation": {
+    "title": "Confirm transfer",
+    "youSend": "You send",
+    "fee": "Fee",
+    "rate": "Rate",
+    "youReceive": "Recipient gets",
+    "expiresIn": "Quote expires in {seconds}s",
+    "expiredTitle": "This quote expired",
+    "backToQuote": "Back to quote",
+    "confirmCta": "Confirm and send"
+  },
+  "result": {
+    "successTitle": "Transfer completed",
+    "successBody": "{amount} is on its way.",
+    "failureTitle": "Transfer failed",
+    "retryCta": "Try again",
+    "doneCta": "Done"
+  },
+  "errors": {
+    "network": "No connection. Check your internet and try again.",
+    "rateUnavailable": "Exchange rate is temporarily unavailable.",
+    "amountNotNumeric": "Enter a valid amount.",
+    "amountNotPositive": "Enter an amount greater than zero.",
+    "amountTooLow": "Amount is below the minimum.",
+    "amountTooHigh": "Amount is above the maximum.",
+    "amountBelowFee": "Amount must be greater than the fee.",
+    "quoteExpired": "This quote expired. Please request a new one.",
+    "unexpected": "Something went wrong. Please try again."
+  },
+  "common": {
+    "retry": "Retry"
+  }
 }

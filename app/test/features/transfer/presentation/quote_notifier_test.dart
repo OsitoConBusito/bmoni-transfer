@@ -52,8 +52,7 @@ void main() {
   });
 
   test('given a valid amount, when onAmountChanged, then a quote', () async {
-    when(() => repository.getQuote('1000'))
-        .thenAnswer((_) async => Ok(_quote));
+    when(() => repository.getQuote('1000')).thenAnswer((_) async => Ok(_quote));
     final container = _containerWith(repository);
 
     container.read(quoteProvider.notifier).onAmountChanged('1000');
@@ -62,9 +61,21 @@ void main() {
     expect(container.read(quoteProvider).value, _quote);
   });
 
+  test('given 0 or non-numeric, when onAmountChanged, then no BE call', () {
+    final container = _containerWith(repository);
+    final notifier = container.read(quoteProvider.notifier)
+      ..onAmountChanged('0');
+
+    expect(container.read(quoteProvider).error, isA<ValidationFailure>());
+    notifier.onAmountChanged('abc');
+    expect(container.read(quoteProvider).error, isA<ValidationFailure>());
+    verifyNever(() => repository.getQuote(any()));
+  });
+
   test('given a failing rate, when onAmountChanged, then an error', () async {
-    when(() => repository.getQuote(any()))
-        .thenAnswer((_) async => const Err(RateUnavailableFailure()));
+    when(
+      () => repository.getQuote(any()),
+    ).thenAnswer((_) async => const Err(RateUnavailableFailure()));
     final container = _containerWith(repository);
 
     container.read(quoteProvider.notifier).onAmountChanged('1000');
@@ -78,8 +89,7 @@ void main() {
   test('given the field is cleared mid-flight, then the stale reply is '
       'ignored', () async {
     final pending = Completer<Result<Quote>>();
-    when(() => repository.getQuote('1000'))
-        .thenAnswer((_) => pending.future);
+    when(() => repository.getQuote('1000')).thenAnswer((_) => pending.future);
     final container = _containerWith(repository);
 
     container.read(quoteProvider.notifier).onAmountChanged('1000');

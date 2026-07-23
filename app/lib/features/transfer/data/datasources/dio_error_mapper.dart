@@ -34,5 +34,4 @@ Map<String, dynamic>? _errorEnvelope(Object? data) {
 String _readCode(Object? data) =>
     _errorEnvelope(data)?['code'] as String? ?? 'UNKNOWN';
 
-String? _readField(Object? data) =>
-    _errorEnvelope(data)?['field'] as String?;
+String? _readField(Object? data) => _errorEnvelope(data)?['field'] as String?;

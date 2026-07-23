@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('given English, when the app boots, then landing renders', (
+  testWidgets('given English, when the app boots, then amount entry renders', (
     tester,
   ) async {
     LocaleSettings.setLocaleSync(AppLocale.en);
@@ -15,7 +15,7 @@ void main() {
       ),
     );
 
-    expect(find.text('BMONI'), findsOneWidget);
-    expect(find.text('Send money from Mexico to the US'), findsOneWidget);
+    expect(find.text('Send money'), findsOneWidget);
+    expect(find.text('You send (MXN)'), findsOneWidget);
   });
 }

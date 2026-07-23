@@ -46,8 +46,7 @@ void main() {
   });
 
   test('given Ok, when getQuote, then Quote propagates', () async {
-    when(() => datasource.getQuote('1000'))
-        .thenAnswer((_) async => Ok(_quote));
+    when(() => datasource.getQuote('1000')).thenAnswer((_) async => Ok(_quote));
 
     final result = await repository.getQuote('1000');
 
@@ -55,8 +54,9 @@ void main() {
   });
 
   test('given Err, when getQuote, then failure propagates', () async {
-    when(() => datasource.getQuote(any()))
-        .thenAnswer((_) async => const Err(NetworkFailure()));
+    when(
+      () => datasource.getQuote(any()),
+    ).thenAnswer((_) async => const Err(NetworkFailure()));
 
     final result = await repository.getQuote('1000');
 

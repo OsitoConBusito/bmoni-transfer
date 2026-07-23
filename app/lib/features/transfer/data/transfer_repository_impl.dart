@@ -10,8 +10,7 @@ class TransferRepositoryImpl implements TransferRepository {
   final TransferRemoteDatasource _datasource;
 
   @override
-  Future<Result<Quote>> getQuote(String amount) =>
-      _datasource.getQuote(amount);
+  Future<Result<Quote>> getQuote(String amount) => _datasource.getQuote(amount);
 
   @override
   Future<Result<Transfer>> createTransfer({
