@@ -73,6 +73,10 @@ export class Money {
     return this.minorUnits > other.minorUnits;
   }
 
+  isPositive(): boolean {
+    return this.minorUnits > 0;
+  }
+
   /**
    * Convert to `target` by applying an FX rate. Both currencies share exponent 2 in this
    * slice, so target minor units = round_half_up(sourceMinor * rate). The multiplication

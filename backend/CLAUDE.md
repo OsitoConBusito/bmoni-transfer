@@ -21,7 +21,10 @@ Use cases devuelven `Result<T, AppError>`; el camino de fallo esperado va por `e
 best-effort con `logger.warn`. Nada de `catch` que trague el error sin log ni transformación.
 
 ## Validación e input
-- Zod en el borde. `amount` del query se valida y se escala a centavos antes de tocar el dominio.
+- Zod en el borde para la **estructura** del request (shape del body, presencia de campos). La
+  **validación de negocio del monto** (numérico exacto, positivo, min/max, cubre el fee) vive en el
+  use case y viaja como `Result<_, AppError>` — parsear dinero exacto exige `Money`, no un coerce de Zod.
+- Un middleware de error final loguea lo inesperado y responde un envelope 500 curado (nunca stack traces).
 - Códigos de error como unión cerrada `as const` (no strings mágicos). Envelope consistente:
   `{ error: { code, message, field? } }`.
 

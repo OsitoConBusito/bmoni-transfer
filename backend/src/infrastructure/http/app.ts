@@ -1,5 +1,5 @@
 import cors from "cors";
-import express, { type Express } from "express";
+import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { pinoHttp } from "pino-http";
@@ -38,6 +38,12 @@ export const createApp = (config: Config, deps: AppDependencies): Express => {
   });
 
   app.use("/api/v1", quoteRouter(deps.getQuote));
+
+  // Final safety net: unexpected errors are logged, never leaked. Clients get a curated envelope.
+  app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    logger.error({ err: error }, "unhandled error");
+    res.status(500).json({ error: { code: "INTERNAL", message: "Internal server error" } });
+  });
 
   return app;
 };

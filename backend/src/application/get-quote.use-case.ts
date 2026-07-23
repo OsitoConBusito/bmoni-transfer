@@ -75,7 +75,7 @@ export class GetQuoteUseCase {
         ),
       );
     }
-    if (amount.toMajor() <= 0) {
+    if (!amount.isPositive()) {
       return err(
         validationError(ErrorCode.AMOUNT_NOT_POSITIVE, "Amount must be positive", "amount"),
       );
