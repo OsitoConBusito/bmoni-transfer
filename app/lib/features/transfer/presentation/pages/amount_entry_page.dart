@@ -65,35 +65,45 @@ class _AmountEntryPageState extends ConsumerState<AmountEntryPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const RecipientCard(),
-              const Gap(AppSpacing.lg),
-              _AmountHero(
-                controller: _controller,
-                formatter: _formatter,
-                onAmountChanged: notifier.onAmountChanged,
-                errorText: fieldError,
-              ),
-              const Gap(AppSpacing.xl),
+              // Scrolls so the keyboard never overflows the fixed content; the
+              // CTA below stays pinned above the keyboard.
               Expanded(
-                child: asyncQuote.when(
-                  data: (quote) => quote == null
-                      ? const _QuoteEmpty()
-                      : QuoteCard(quote: quote),
-                  loading: () => const QuoteCardShimmer(),
-                  error: (error, _) => error is ValidationFailure
-                      ? const _QuoteEmpty()
-                      : AppErrorState(
-                          message: failureMessage(
-                            translations,
-                            error as Failure,
-                          ),
-                          retryLabel: translations.common.retry,
-                          onRetry: () => notifier.onAmountChanged(
-                            _formatter.cleanMajorFrom(_controller.text),
-                          ),
-                        ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const RecipientCard(),
+                      const Gap(AppSpacing.lg),
+                      _AmountHero(
+                        controller: _controller,
+                        formatter: _formatter,
+                        onAmountChanged: notifier.onAmountChanged,
+                        errorText: fieldError,
+                      ),
+                      const Gap(AppSpacing.xl),
+                      asyncQuote.when(
+                        data: (quote) => quote == null
+                            ? const _QuoteEmpty()
+                            : QuoteCard(quote: quote),
+                        loading: () => const QuoteCardShimmer(),
+                        error: (error, _) => error is ValidationFailure
+                            ? const _QuoteEmpty()
+                            : AppErrorState(
+                                message: failureMessage(
+                                  translations,
+                                  error as Failure,
+                                ),
+                                retryLabel: translations.common.retry,
+                                onRetry: () => notifier.onAmountChanged(
+                                  _formatter.cleanMajorFrom(_controller.text),
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              const Gap(AppSpacing.md),
               AppButton(
                 label: translations.amountEntry.continueCta,
                 onPressed: quote == null
