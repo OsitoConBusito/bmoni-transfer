@@ -1,7 +1,5 @@
-/// Runtime config. `BASE_URL` is injected at build time via `--dart-define`.
-/// Default targets the Android emulator host loopback (10.0.2.2) for local dev;
-/// override for iOS simulator (http://localhost:3000) or the hosted backend.
 abstract final class AppConfig {
+  // Android emulator host loopback by default; override via --dart-define.
   static const String baseUrl = String.fromEnvironment(
     'BASE_URL',
     defaultValue: 'http://10.0.2.2:3000',

@@ -1,7 +1,5 @@
 import 'package:bmoni_transfer/core/error/failure.dart';
 
-/// Errors as values (no fpdart). Expected failures return `Err`; the UI
-/// switches on it.
 sealed class Result<T> {
   const Result();
 }
