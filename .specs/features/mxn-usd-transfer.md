@@ -242,7 +242,8 @@ El body **solo** lleva `quoteId`. El BE recupera la quote guardada, verifica exp
 }
 ```
 **Errores:** `400` (`IDEMPOTENCY_KEY_REQUIRED`, `QUOTE_ID_REQUIRED`), `404 QUOTE_NOT_FOUND`,
-`409` (`QUOTE_EXPIRED`, `QUOTE_ALREADY_USED`, `IDEMPOTENCY_KEY_REUSED`).
+`409` (`QUOTE_EXPIRED`, `QUOTE_ALREADY_USED`, `IDEMPOTENCY_KEY_REUSED`, `QUOTE_TAMPERED`).
+`QUOTE_TAMPERED`: la firma HMAC de la quote guardada no verifica (integridad; ver security.md CA-S2).
 
 ### Envelope de error (consistente)
 ```json
