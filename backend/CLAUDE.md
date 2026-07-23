@@ -1,43 +1,59 @@
-# backend — reglas (Node/TS)
+# backend — rules (Node/TS)
 
-Reglas específicas del backend. Cross-cutting (dinero, idempotencia) y contrato:
-ver [/CLAUDE.md](../CLAUDE.md) y [/.specs/features/mxn-usd-transfer.md](../.specs/features/mxn-usd-transfer.md).
+Backend-specific rules. Cross-cutting invariants (money, idempotency) and the
+contract: see [/CLAUDE.md](../CLAUDE.md) and
+[/.specs/features/mxn-usd-transfer.md](../.specs/features/mxn-usd-transfer.md).
 
-## Arquitectura — hexagonal-light
-Dependencias hacia adentro: `infrastructure → application → domain`. Árbol en § Arquitectura del spec.
-- `domain/` es PURO: no importa Express, `http`, ni nada de I/O. Solo VOs, entities, reglas y **ports**
-  (interfaces `RateProvider`, `Repository`).
-- `application/` orquesta use cases y devuelve `Result<T, AppError>`. No arma respuestas HTTP.
-- `infrastructure/` implementa los ports (Frankfurter/stub, repos in-memory) y expone los handlers.
-- `shared/` = `Result`, tipos de error, config.
+## Architecture — hexagonal-light
+Dependencies point inward: `infrastructure → application → domain`. Tree in
+the spec's § Architecture.
+- `domain/` is PURE: no Express, no `http`, no I/O of any kind. Only VOs,
+  entities, rules, and **ports** (the `RateProvider`, `Repository`
+  interfaces).
+- `application/` orchestrates use cases and returns `Result<T, AppError>`.
+  It never builds HTTP responses.
+- `infrastructure/` implements the ports (Frankfurter/stub, in-memory
+  repos) and exposes the handlers.
+- `shared/` = `Result`, error types, config.
 
-## Handlers finos
-Un handler: parsea el input (Zod) → llama al use case → mapea el `Result` a HTTP con un helper.
-Sin lógica de negocio, validación de dominio, ni storage en el handler.
+## Thin handlers
+One handler: parse the input (Zod) → call the use case → map the `Result`
+to HTTP with a helper. No business logic, domain validation, or storage in
+the handler.
 
-## Errores como valor
-Use cases devuelven `Result<T, AppError>`; el camino de fallo esperado va por `err(...)`, nunca `throw`.
-`try/catch` permitido solo en (a) el borde del handler (mapear lo inesperado a 500) y (b) side-effects
-best-effort con `logger.warn`. Nada de `catch` que trague el error sin log ni transformación.
+## Errors as values
+Use cases return `Result<T, AppError>`; the expected failure path goes
+through `err(...)`, never `throw`. `try/catch` is allowed only at (a) the
+handler boundary (mapping the unexpected to 500) and (b) best-effort side
+effects with `logger.warn`. No `catch` that swallows an error without
+logging or transforming it.
 
-## Validación e input
-- Zod en el borde para la **estructura** del request (shape del body, presencia de campos). La
-  **validación de negocio del monto** (numérico exacto, positivo, min/max, cubre el fee) vive en el
-  use case y viaja como `Result<_, AppError>` — parsear dinero exacto exige `Money`, no un coerce de Zod.
-- Un middleware de error final loguea lo inesperado y responde un envelope 500 curado (nunca stack traces).
-- Códigos de error como unión cerrada `as const` (no strings mágicos). Envelope consistente:
-  `{ error: { code, message, field? } }`.
+## Validation and input
+- Zod at the boundary for the request's **shape** (body structure, field
+  presence). **Business validation of the amount** (exact numeric,
+  positive, min/max, covers the fee) lives in the use case and travels as
+  `Result<_, AppError>` — parsing exact money requires `Money`, not a Zod
+  coerce.
+- A final error middleware logs the unexpected and responds with a curated
+  500 envelope (never stack traces).
+- Error codes as a closed union `as const` (no magic strings). Consistent
+  envelope: `{ error: { code, message, field? } }`.
 
 ## TypeScript
-- TS strict, sin `any` (usar `unknown` + narrow). `as` solo tras validación real.
-- Money en minor units enteros (ver invariante cross-cutting). El wire transporta enteros, no decimales.
+- TS strict, no `any` (use `unknown` + narrow). `as` only after real
+  validation.
+- Money in integer minor units (see the cross-cutting invariant). The wire
+  carries integers, never decimals.
 
 ## Storage
-In-memory detrás del port `Repository` (swappable a DB después). Estado: maps de quotes, transfers,
-idempotency keys, y quotes usadas. Caché de rate con TTL (sobre el port `Clock`).
+In-memory behind the `Repository` port (swappable for a DB later). State:
+maps of quotes, transfers, idempotency keys, and used quotes. Rate cache
+with a TTL (over the `Clock` port).
 
-## Seguridad (ver [/.specs/features/security.md](../.specs/features/security.md))
-helmet + CORS allowlist (no wildcard) + express-rate-limit + límite de body + pino con redacción.
-Errores nunca filtran stack traces/internals: solo el envelope curado; los 500 se loguean, no se exponen.
-El monto no es editable: el cliente manda solo `quoteId`; el BE recalcula desde la quote guardada y
-valida su firma **HMAC** (secret server-side, nunca al cliente). Determinismo vía port `Clock`.
+## Security (see [/.specs/features/security.md](../.specs/features/security.md))
+helmet + CORS allowlist (no wildcard) + express-rate-limit + body-size
+limit + pino with redaction. Errors never leak stack traces/internals: only
+the curated envelope; 500s are logged, not exposed. The amount isn't
+editable: the client sends only `quoteId`; the backend recalculates from
+the stored quote and verifies its **HMAC** signature (server-side secret,
+never sent to the client). Determinism via the `Clock` port.

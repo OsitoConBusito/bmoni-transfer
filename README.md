@@ -1,23 +1,41 @@
 # bmoni-transfer
 
-Slice vertical **MXN → USD**: cotizar y confirmar una transferencia de forma
-**retry-safe**. Backend Node/TS (`backend/`) + app Flutter (`app/`).
+Vertical slice **MXN → USD**: quote and confirm a transfer, **retry-safe**.
+Node/TS backend (`backend/`) + Flutter app (`app/`).
 
-- **El contrato** (endpoints, entidades, reglas de negocio, criterios de aceptación)
-  vive en [.specs/features/mxn-usd-transfer.md](.specs/features/mxn-usd-transfer.md) — fuente de verdad.
-- **El porqué** de cada decisión técnica está en [DECISIONS.txt](DECISIONS.txt).
+- **The contract** (endpoints, entities, business rules, acceptance criteria)
+  lives in [.specs/features/mxn-usd-transfer.md](.specs/features/mxn-usd-transfer.md) — source of truth.
+- **The why** behind every technical decision is in [DECISIONS.txt](DECISIONS.txt).
 
 ---
 
-## Requisitos
+## Requirements
 
-| Herramienta | Versión usada |
+| Tool | Version used |
 |---|---|
 | Node    | ≥ 22 (LTS, ESM) |
 | Flutter | 3.44.x (stable) — Dart 3.9 |
 
-No hace falta base de datos: el estado del backend es in-memory detrás de un puerto
-de repositorio (swappable a DB después).
+No database needed: the backend's state is in-memory behind a repository
+port (swappable for a real DB later).
+
+---
+
+## How to run the app (quick start)
+
+Two terminals, in this order:
+
+```bash
+# Terminal 1 — backend
+cd backend && npm install && npm run dev
+# -> listening on http://localhost:3000
+
+# Terminal 2 — app (with an Android emulator already running)
+cd app && flutter pub get && flutter run
+```
+
+The Android emulator talks to the local backend with no extra config
+(`10.0.2.2` is the default — see the scenarios table below for iOS/physical device).
 
 ---
 
@@ -29,109 +47,101 @@ npm install
 npm run dev          # tsx watch — http://localhost:3000
 ```
 
-Verificación rápida:
+Quick check:
 
 ```bash
 curl http://localhost:3000/health                     # {"status":"ok"}
-curl "http://localhost:3000/api/v1/quote?amount=1000" # cotización MXN→USD
+curl "http://localhost:3000/api/v1/quote?amount=1000" # MXN→USD quote
 ```
 
 Scripts:
 
-| Script | Qué hace |
+| Script | What it does |
 |---|---|
-| `npm run dev`       | Servidor en watch mode (tsx), sin build |
-| `npm run build`     | Compila TS a `dist/` (tsc) |
-| `npm start`         | Corre el build (`node dist/main.js`) — usado en prod |
-| `npm test`          | Suite Vitest (unit + integración con supertest) |
+| `npm run dev`       | Watch-mode server (tsx), no build step |
+| `npm run build`     | Compiles TS to `dist/` (tsc) |
+| `npm start`         | Runs the build (`node dist/main.js`) — used in prod |
+| `npm test`          | Vitest suite (unit + integration with supertest) |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint`      | Biome check |
 
-### Configuración (env vars)
+### Configuration (env vars)
 
-Todas tienen default seguro para desarrollo; el server valida con Zod al arrancar y
-**falla rápido** si algo es inválido. Los montos se declaran en unidades mayores (MXN)
-y se convierten a centavos al entrar al dominio.
+All have a safe default for development; the server validates with Zod on
+startup and **fails fast** if anything is invalid. Amounts are declared in
+major units (MXN) and converted to cents once they enter the domain.
 
-| Var | Default | Nota |
+| Var | Default | Note |
 |---|---|---|
 | `PORT`             | `3000` | |
-| `NODE_ENV`         | `development` | En `production` se exige `HMAC_SECRET` no-default |
-| `CORS_ALLOWLIST`   | `http://localhost:8080` | Orígenes separados por coma (sin wildcard) |
-| `RATE_PROVIDER`    | `frankfurter` | `frankfurter` (ECB, sin API key) o `stub` (determinista) |
-| `RATE_CACHE_TTL_MS`| `60000` | TTL de la caché de rate en memoria |
-| `QUOTE_TTL_MS`     | `60000` | Vigencia de una cotización |
-| `FEE_FLAT_MXN`     | `20` | Fee plano bajo el umbral |
-| `FEE_THRESHOLD_MXN`| `5000` | Sobre este monto aplica fee porcentual |
-| `FEE_PERCENT`      | `0.01` | 1% sobre el umbral |
+| `NODE_ENV`         | `development` | In `production`, a non-default `HMAC_SECRET` is required |
+| `CORS_ALLOWLIST`   | `http://localhost:8080` | Comma-separated origins (no wildcard) |
+| `RATE_PROVIDER`    | `frankfurter` | `frankfurter` (ECB, no API key) or `stub` (deterministic) |
+| `RATE_CACHE_TTL_MS`| `60000` | In-memory rate cache TTL |
+| `QUOTE_TTL_MS`     | `60000` | How long a quote stays valid |
+| `FEE_FLAT_MXN`     | `20` | Flat fee below the threshold |
+| `FEE_THRESHOLD_MXN`| `5000` | Percent fee kicks in above this amount |
+| `FEE_PERCENT`      | `0.01` | 1% above the threshold |
 | `MIN_AMOUNT_MXN`   | `10` | |
 | `MAX_AMOUNT_MXN`   | `100000` | |
-| `HMAC_SECRET`      | *(dev fallback)* | **Obligatorio** en producción — firma la quote |
+| `HMAC_SECRET`      | *(dev fallback)* | **Required** in production — signs the quote |
 
 ---
 
-## App Flutter (`app/`)
+## Flutter app (`app/`)
 
 ```bash
 cd app
 flutter pub get
-flutter run          # apunta al backend local por defecto
+flutter run          # points at the local backend by default
 ```
 
-El endpoint del backend se inyecta en build-time con `--dart-define BASE_URL`.
-El **default es `http://10.0.2.2:3000`** (loopback del host desde el emulador Android),
-así que `flutter run` a secas ya habla con el backend local corriendo en tu máquina.
+The backend endpoint is injected at build time via `--dart-define BASE_URL`.
+The **default is `http://10.0.2.2:3000`** (host loopback from the Android
+emulator), so a plain `flutter run` already talks to the backend running on
+your machine.
 
-| Escenario | Comando |
+| Scenario | Command |
 |---|---|
-| Emulador Android → backend local | `flutter run` (default `10.0.2.2:3000`) |
-| iOS simulator / desktop → backend local | `flutter run --dart-define BASE_URL=http://localhost:3000` |
-| Dispositivo físico → backend en tu LAN | `flutter run --dart-define BASE_URL=http://<IP-de-tu-máquina>:3000` |
-| Contra el backend desplegado | `flutter run --dart-define BASE_URL=https://<prod-url>` |
+| Android emulator → local backend | `flutter run` (default `10.0.2.2:3000`) |
+| iOS simulator / desktop → local backend | `flutter run --dart-define BASE_URL=http://localhost:3000` |
+| Physical device → backend on your LAN | `flutter run --dart-define BASE_URL=http://<your-machine-IP>:3000` |
 
-Tests y análisis:
+Tests and analysis:
 
 ```bash
 flutter analyze
 flutter test
 ```
 
-### APK de release
-
-El binario release va ofuscado y apunta al backend de producción:
-
-```bash
-flutter build apk --release \
-  --dart-define BASE_URL=https://<prod-url> \
-  --obfuscate --split-debug-info=build/symbols
-```
-
-El APK firmado se distribuye por **GitHub Releases** de este repo.
+No public deploy or distributed APK: for this take-home, running both sides
+locally is enough (see [DECISIONS.txt](DECISIONS.txt) § What was cut).
 
 ---
 
-## API (resumen)
+## API (summary)
 
-Base path: `/api/v1`. Detalle completo y criterios de aceptación en el
+Base path: `/api/v1`. Full detail and acceptance criteria in the
 [spec](.specs/features/mxn-usd-transfer.md).
 
-| Método | Path | Descripción |
+| Method | Path | Description |
 |---|---|---|
 | `GET`  | `/health` | Liveness → `{ "status": "ok" }` |
-| `GET`  | `/api/v1/quote?amount=<MXN>` | Cotiza; devuelve `quoteId`, desglose y `expiresAt` |
-| `POST` | `/api/v1/transfers` | Confirma. Header `Idempotency-Key` **requerido**; body solo `{ "quoteId" }` |
+| `GET`  | `/api/v1/quote?amount=<MXN>` | Quotes; returns `quoteId`, breakdown and `expiresAt` |
+| `POST` | `/api/v1/transfers` | Confirms. `Idempotency-Key` header **required**; body is just `{ "quoteId" }` |
 
-El dinero viaja como **enteros en minor units** (`{ minorUnits, currency }`), nunca
-como decimales. El cliente **nunca** envía ni recalcula rate/fee/USD: manda solo el
-`quoteId` y el backend recalcula desde la quote guardada (ver [DECISIONS.txt](DECISIONS.txt)).
+Money travels as **integer minor units** (`{ minorUnits, currency }`), never
+as decimals. The client **never** sends or recomputes rate/fee/USD: it sends
+only the `quoteId`, and the backend recalculates from the stored quote (see
+[DECISIONS.txt](DECISIONS.txt)).
 
 ---
 
-## Estructura
+## Structure
 
 ```
 bmoni-transfer/
 ├── backend/   Node/TS — hexagonal-light (domain / application / infrastructure)
 ├── app/       Flutter — Clean Arch feature-first (transfer: domain / data / presentation) + core + shared
-└── .specs/    Spec SDD (fuente de verdad del contrato)
+└── .specs/    SDD spec (source of truth for the contract)
 ```
