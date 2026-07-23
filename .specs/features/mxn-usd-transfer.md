@@ -217,7 +217,9 @@ CORS habilitado (permite correr el Flutter en web). Logger estructurado **pino**
 }
 ```
 **Errores:** `400` (`AMOUNT_REQUIRED`, `AMOUNT_NOT_NUMERIC`, `AMOUNT_TOO_LOW`, `AMOUNT_TOO_HIGH`,
-`AMOUNT_NOT_POSITIVE`), `503 RATE_UNAVAILABLE`.
+`AMOUNT_NOT_POSITIVE`, `AMOUNT_BELOW_FEE`), `503 RATE_UNAVAILABLE`.
+`AMOUNT_BELOW_FEE`: el monto no cubre el fee (`sourceAmount ≤ fee`) — posible porque el mínimo
+(10 MXN) es menor que el fee flat (20 MXN); sin esto el `destAmount` sería negativo.
 
 ### `POST /transfers`
 Headers: `Idempotency-Key: <uuid>` (requerido).
